@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Go implementation  txtelite
+// Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
 
 // four byte random number used for planet description
 type fastseed struct {
