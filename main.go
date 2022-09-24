@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"strings"
 )
@@ -64,6 +65,8 @@ var unitnames = []string{"t", "kg", "g"}
 var lastrand int64 = 0
 
 var galaxyNum uint = 1
+
+var currentPlanet int
 
 func gen_rnd_number() uint {
 	var a, x uint
@@ -211,6 +214,33 @@ func makeSystem(s *seed) planetarySystem {
 	planSys.name = strings.ReplaceAll(string(name), ".", "")
 
 	return planSys
+}
+
+/* Return id of the planet whose name matches passed strinmg
+   closest to currentplanet - if none return currentplanet */
+
+func matchsys(platnetName string) int {
+
+	p := currentPlanet
+	d := 9999
+
+	for syscount := 0; syscount < galSize; syscount++ {
+		if strings.HasPrefix(galaxy[syscount].name, platnetName) {
+			if distance(galaxy[syscount], galaxy[currentPlanet]) < d {
+				d = distance(galaxy[syscount], galaxy[currentPlanet])
+				p = syscount
+			}
+		}
+	}
+	return p
+}
+
+// Seperation between two planets (4*sqrt(X*X+Y*Y/4))
+func distance(planetA planetarySystem, planetB planetarySystem) int {
+
+	val := (float64((planetA.x-planetB.x)*(planetA.x-planetB.x) + (planetA.y-planetB.y)*(planetA.y-planetB.y))) / 4.0
+
+	return int(4 * math.Sqrt(val))
 }
 
 func goatSoup(source string, psy *planetarySystem) {
@@ -367,15 +397,25 @@ func printSystem(plsy planetarySystem, compressed bool) {
 }
 
 func main() {
+	// Init things
 	mysrand(12345)
 
 	galaxynum := 1
 	buildGalaxy(galaxynum)
+	currentPlanet = 7 // Lave
+	debugTests()
 
-	// test Lave
-	printSystem(galaxy[7], false)
+}
 
-	// test Diso
-	printSystem(galaxy[147], false)
+func debugTests() {
 
+	fmt.Printf("The current system is: %s", galaxy[currentPlanet].name)
+	// test current planet (Lave at start)
+	printSystem(galaxy[currentPlanet], false)
+	fmt.Println()
+	// test matchsys
+	fmt.Printf("DISO is system numner: %d", matchsys("DISO")) // 147
+
+	diso := matchsys("DISO")
+	printSystem(galaxy[diso], false)
 }
