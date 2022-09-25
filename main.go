@@ -68,7 +68,7 @@ type planetDataTables struct {
 // TODO: Will be added to the markets structures when I add them
 var unitnames = []string{"t", "kg", "g"}
 
-func initGalaxy() galaxy {
+func initGalaxy(galaxyNumber int) galaxy {
 	galaxy := galaxy{}
 
 	// Data Tables
@@ -97,7 +97,7 @@ func initGalaxy() galaxy {
 	// Galaxy
 	galaxy.size = 256
 	galaxy.currentPlanet = 7 // Start at Lave
-	galaxy.galaxyNum = 1
+	galaxy.galaxyNum = galaxyNumber
 	galaxy.prng = galRNG
 	galaxy.systems = make([]planetarySystem, galaxy.size)
 
@@ -445,7 +445,7 @@ func (g *galaxy) printSystem(plsy planetarySystem, compressed bool) {
 
 func main() {
 
-	galaxy := initGalaxy()
+	galaxy := initGalaxy(1)
 	debugTests(galaxy)
 
 }
