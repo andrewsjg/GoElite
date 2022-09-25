@@ -65,6 +65,7 @@ type planetDataTables struct {
 	econnames []string
 }
 
+// TODO: Will be added to the markets structures when I add them
 var unitnames = []string{"t", "kg", "g"}
 
 func initGalaxy() galaxy {
