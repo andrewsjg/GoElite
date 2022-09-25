@@ -37,6 +37,11 @@ type planetarySystem struct {
 	name         string
 }
 
+type gal struct {
+	size    int
+	systems []planetarySystem
+}
+
 var mainseed seed
 var rnd_seed fastseed
 
@@ -128,9 +133,10 @@ func nextgalaxy(s *seed) {
 func buildGalaxy(galaxyNum int) {
 	var syscount, galcount int
 
+	/* Initialise seed for galaxy 1 */
 	mainseed.w0 = base0
 	mainseed.w1 = base1
-	mainseed.w2 = base2 /* Initialise seed for galaxy 1 */
+	mainseed.w2 = base2
 
 	for galcount = 1; galcount < galaxyNum; galcount++ {
 		nextgalaxy(&mainseed)
