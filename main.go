@@ -71,7 +71,7 @@ var unitnames = []string{"t", "kg", "g"}
 func initGalaxy(galaxyNumber int) galaxy {
 	galaxy := galaxy{}
 
-	// Data Tables
+	// Data Tables used to generate planet data
 	dataTables := planetDataTables{}
 
 	dataTables.econnames = []string{"Rich Ind", "Average Ind", "Poor Ind", "Mainly Ind",
@@ -94,13 +94,14 @@ func initGalaxy(galaxyNumber int) galaxy {
 	// Seend the RNG
 	galRNG.mysrand(12345)
 
-	// Galaxy
-	galaxy.size = 256
-	galaxy.currentPlanet = 7 // Start at Lave
+	// Galaxy parameters
+	galaxy.size = 256        // Should pass this as a parameter?
+	galaxy.currentPlanet = 7 // Start at Lave. Should pass this as a parameter?
 	galaxy.galaxyNum = galaxyNumber
 	galaxy.prng = galRNG
 	galaxy.systems = make([]planetarySystem, galaxy.size)
 
+	// Populate the galaxy with planetary systems
 	galaxy.buildGalaxy(galaxy.galaxyNum)
 
 	return galaxy
@@ -170,10 +171,6 @@ func (g *galaxy) buildGalaxy(galaxyNum int) {
 	g.prng.galaxySeed.w0 = g.prng.base0
 	g.prng.galaxySeed.w1 = g.prng.base1
 	g.prng.galaxySeed.w2 = g.prng.base2
-
-	//mainseed.w0 = base0
-	//mainseed.w1 = base1
-	//mainseed.w2 = base2
 
 	for galcount = 1; galcount < galaxyNum; galcount++ {
 		g.nextgalaxy(&g.prng.galaxySeed)
