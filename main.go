@@ -11,10 +11,10 @@ import (
 
 // four byte random number used for planet description
 type fastseed struct {
-	a uint
-	b uint
-	c uint
-	d uint
+	a uint16
+	b uint16
+	c uint16
+	d uint16
 }
 
 // six byte random number used as seed for planets
@@ -37,70 +37,102 @@ type planetarySystem struct {
 	name         string
 }
 
-type gal struct {
-	size    int
-	systems []planetarySystem
+type galaxy struct {
+	galaxyNum     int
+	currentPlanet int
+	size          int
+	systems       []planetarySystem
+
+	prng       galPRNG
+	dataTables planetDataTables
 }
 
-var mainseed seed
-var rnd_seed fastseed
+type galPRNG struct {
+	// PRNG For galaxy generation
+	galaxySeed seed
+	rnd_seed   fastseed
+	base0      uint16
+	base1      uint16
+	base2      uint16
 
-const galSize = 256
+	lastrand int64
+}
 
-var galaxy = [galSize]planetarySystem{}
-
-const base0 = 0x5A4A
-const base1 = 0x0248
-const base2 = 0xB753 /* Base seed for galaxy 1 */
-
-var pairs0 = []byte("ABOUSEITILETSTONLONUTHNOALLEXEGEZACEBISOUSESARMAINDIREA.ERATENBERALAVETIEDORQUANTEISRION")
-var pairs = []byte("..LEXEGEZACEBISO" +
-	"USESARMAINDIREA." +
-	"ERATENBERALAVETI" +
-	"EDORQUANTEISRION") /* Dots should be nullprint characters */
-
-var govnames = []string{"Anarchy", "Feudal", "Multi-gov", "Dictatorship",
-	"Communist", "Confederacy", "Democracy", "Corporate State"}
-
-var econnames = []string{"Rich Ind", "Average Ind", "Poor Ind", "Mainly Ind",
-	"Mainly Agri", "Rich Agri", "Average Agri", "Poor Agri"}
+type planetDataTables struct {
+	pairs0    []byte
+	pairs     []byte
+	govnames  []string
+	econnames []string
+}
 
 var unitnames = []string{"t", "kg", "g"}
 
-var lastrand int64 = 0
+func initGalaxy() galaxy {
+	galaxy := galaxy{}
 
-var galaxyNum uint = 1
+	// Data Tables
+	dataTables := planetDataTables{}
 
-var currentPlanet int
+	dataTables.econnames = []string{"Rich Ind", "Average Ind", "Poor Ind", "Mainly Ind",
+		"Mainly Agri", "Rich Agri", "Average Agri", "Poor Agri"}
 
-func gen_rnd_number() uint {
-	var a, x uint
-	x = (rnd_seed.a * 2) & 0xFF
-	a = x + rnd_seed.c
+	dataTables.govnames = []string{"Anarchy", "Feudal", "Multi-gov", "Dictatorship",
+		"Communist", "Confederacy", "Democracy", "Corporate State"}
 
-	if rnd_seed.a > 127 {
+	dataTables.pairs0 = []byte("ABOUSEITILETSTONLONUTHNOALLEXEGEZACEBISOUSESARMAINDIREA.ERATENBERALAVETIEDORQUANTEISRION")
+	dataTables.pairs = []byte("..LEXEGEZACEBISOUSESARMAINDIREA.ERATENBERALAVETIEDORQUANTEISRION") /* Dots should be nullprint characters */
+	galaxy.dataTables = dataTables
+
+	// Galaxy PRNG
+	galRNG := galPRNG{}
+
+	galRNG.base0 = 0x5A4A
+	galRNG.base1 = 0x0248
+	galRNG.base2 = 0xB753
+	galRNG.lastrand = 0
+	// Seend the RNG
+	galRNG.mysrand(12345)
+
+	// Galaxy
+	galaxy.size = 256
+	galaxy.currentPlanet = 7 // Start at Lave
+	galaxy.galaxyNum = 1
+	galaxy.prng = galRNG
+	galaxy.systems = make([]planetarySystem, galaxy.size)
+
+	galaxy.buildGalaxy(galaxy.galaxyNum)
+
+	return galaxy
+}
+
+func (g *galPRNG) gen_rnd_number() uint16 {
+	var a, x uint16
+	x = (g.rnd_seed.a * 2) & 0xFF
+	a = x + g.rnd_seed.c
+
+	if g.rnd_seed.a > 127 {
 		a++
 	}
 
-	rnd_seed.a = a & 0xFF
-	rnd_seed.c = x
+	g.rnd_seed.a = a & 0xFF
+	g.rnd_seed.c = x
 
 	a = a / 256 /* a = any carry left from above */
-	x = rnd_seed.b
-	a = (a + x + rnd_seed.d) & 0xFF
-	rnd_seed.b = a
-	rnd_seed.d = x
+	x = g.rnd_seed.b
+	a = (a + x + g.rnd_seed.d) & 0xFF
+	g.rnd_seed.b = a
+	g.rnd_seed.d = x
 
 	return a
 }
 
-func mysrand(seed int64) {
+func (g *galPRNG) mysrand(seed int64) {
 	rand.Seed(seed)
 
-	lastrand = seed - 1
+	g.lastrand = seed - 1
 }
 
-func tweakseed(s *seed) {
+func (g *galPRNG) tweakseed(s *seed) {
 
 	temp := (s.w0) + (s).w1 + (s.w2) /* 2 byte aritmetic */
 	(*s).w0 = (*s).w1
@@ -124,31 +156,36 @@ Apply to base seed; once for galaxy 2
 	twice for galaxy 3, etc.
 	Eighth application gives galaxy 1 again
 */
-func nextgalaxy(s *seed) {
+func (g *galaxy) nextgalaxy(s *seed) {
 	s.w0 = twist(s.w0)
 	s.w1 = twist(s.w1)
 	s.w2 = twist(s.w2)
 }
 
-func buildGalaxy(galaxyNum int) {
+func (g *galaxy) buildGalaxy(galaxyNum int) {
 	var syscount, galcount int
 
 	/* Initialise seed for galaxy 1 */
-	mainseed.w0 = base0
-	mainseed.w1 = base1
-	mainseed.w2 = base2
+	g.prng.galaxySeed.w0 = g.prng.base0
+	g.prng.galaxySeed.w1 = g.prng.base1
+	g.prng.galaxySeed.w2 = g.prng.base2
+
+	//mainseed.w0 = base0
+	//mainseed.w1 = base1
+	//mainseed.w2 = base2
 
 	for galcount = 1; galcount < galaxyNum; galcount++ {
-		nextgalaxy(&mainseed)
+		g.nextgalaxy(&g.prng.galaxySeed)
 	}
 
 	/* Put galaxy data into array of structures */
-	for syscount = 0; syscount < galSize; syscount++ {
-		galaxy[syscount] = makeSystem(&mainseed)
+	for syscount = 0; syscount < g.size; syscount++ {
+		g.systems[syscount] = g.makeSystem(&g.prng.galaxySeed)
+
 	}
 }
 
-func makeSystem(s *seed) planetarySystem {
+func (g *galaxy) makeSystem(s *seed) planetarySystem {
 
 	var pair1, pair2, pair3, pair4 uint16
 	var longnameflag uint16 = (s.w0) & 64
@@ -181,37 +218,37 @@ func makeSystem(s *seed) planetarySystem {
 
 	planSys.radius = 256*((((s.w2)>>8)&15)+11) + planSys.x
 
-	planSys.goatsoupseed.a = uint(s.w1 & 0xFF)
-	planSys.goatsoupseed.b = uint(s.w1 >> 8)
-	planSys.goatsoupseed.c = uint(s.w2 & 0xFF)
-	planSys.goatsoupseed.d = uint(s.w2 >> 8)
+	planSys.goatsoupseed.a = (s.w1 & 0xFF)
+	planSys.goatsoupseed.b = (s.w1 >> 8)
+	planSys.goatsoupseed.c = (s.w2 & 0xFF)
+	planSys.goatsoupseed.d = (s.w2 >> 8)
 
 	pair1 = 2 * (((s.w2) >> 8) & 31)
-	tweakseed(s)
+	g.prng.tweakseed(s)
 
 	pair2 = 2 * (((s.w2) >> 8) & 31)
-	tweakseed(s)
+	g.prng.tweakseed(s)
 
 	pair3 = 2 * (((s.w2) >> 8) & 31)
-	tweakseed(s)
+	g.prng.tweakseed(s)
 
 	pair4 = 2 * (((s.w2) >> 8) & 31)
-	tweakseed(s)
+	g.prng.tweakseed(s)
 	/* Always four iterations of random number */
 
 	name := make([]byte, 8)
 
-	name[0] = pairs[pair1]
-	name[1] = pairs[pair1+1]
-	name[2] = pairs[pair2]
-	name[3] = pairs[pair2+1]
-	name[4] = pairs[pair3]
-	name[5] = pairs[pair3+1]
+	name[0] = g.dataTables.pairs[pair1]
+	name[1] = g.dataTables.pairs[pair1+1]
+	name[2] = g.dataTables.pairs[pair2]
+	name[3] = g.dataTables.pairs[pair2+1]
+	name[4] = g.dataTables.pairs[pair3]
+	name[5] = g.dataTables.pairs[pair3+1]
 
 	/* bit 6 of ORIGINAL w0 flags a four-pair name */
 	if longnameflag == 1 {
-		name[6] = pairs[pair4]
-		name[7] = pairs[pair4+1]
+		name[6] = g.dataTables.pairs[pair4]
+		name[7] = g.dataTables.pairs[pair4+1]
 		name[8] = 0
 	} else {
 		name[6] = 0
@@ -225,19 +262,22 @@ func makeSystem(s *seed) planetarySystem {
 /* Return id of the planet whose name matches passed strinmg
    closest to currentplanet - if none return currentplanet */
 
-func matchsys(platnetName string) int {
+func (g *galaxy) matchsys(platnetName string) int {
 
-	p := currentPlanet
+	p := g.currentPlanet
 	d := 9999
 
-	for syscount := 0; syscount < galSize; syscount++ {
-		if strings.HasPrefix(galaxy[syscount].name, platnetName) {
-			if distance(galaxy[syscount], galaxy[currentPlanet]) < d {
-				d = distance(galaxy[syscount], galaxy[currentPlanet])
+	for syscount := 0; syscount < g.size; syscount++ {
+
+		if strings.HasPrefix(g.systems[syscount].name, platnetName) {
+			if distance(g.systems[syscount], g.systems[g.currentPlanet]) < d {
+
+				d = distance(g.systems[syscount], g.systems[g.currentPlanet])
 				p = syscount
 			}
 		}
 	}
+
 	return p
 }
 
@@ -249,7 +289,7 @@ func distance(planetA planetarySystem, planetB planetarySystem) int {
 	return int(4 * math.Sqrt(val))
 }
 
-func goatSoup(source string, psy *planetarySystem) {
+func (g *galaxy) goatSoup(source string, psy *planetarySystem) {
 
 	desc := [][]string{
 		{"fabled", "notable", "well known", "famous", "noted"},
@@ -304,7 +344,7 @@ func goatSoup(source string, psy *planetarySystem) {
 			fmt.Printf("%s", c)
 		} else {
 			if cr <= 0xA4 {
-				rnd := gen_rnd_number()
+				rnd := g.prng.gen_rnd_number()
 
 				a := 0
 				b := 0
@@ -327,7 +367,7 @@ func goatSoup(source string, psy *planetarySystem) {
 					d = 1
 				}
 
-				goatSoup(desc[int(cr-0x81)][a+b+c+d], psy)
+				g.goatSoup(desc[int(cr-0x81)][a+b+c+d], psy)
 
 			} else {
 
@@ -351,17 +391,17 @@ func goatSoup(source string, psy *planetarySystem) {
 					fmt.Printf("ian")
 					break
 				case 0xB2: /* random name */
-					length := gen_rnd_number() & 3
+					length := g.prng.gen_rnd_number() & 3
 
-					for i := 0; uint(i) <= length; i++ {
-						x := gen_rnd_number() & 0x3e
+					for i := 0; uint16(i) <= length; i++ {
+						x := g.prng.gen_rnd_number() & 0x3e
 						if i == 0 {
-							fmt.Printf("%c", pairs0[x])
+							fmt.Printf("%c", g.dataTables.pairs0[x])
 						} else {
-							fmt.Printf("%s", strings.ToLower(string(pairs0[x])))
+							fmt.Printf("%s", strings.ToLower(string(g.dataTables.pairs0[x])))
 						}
 
-						fmt.Printf("%s", strings.ToLower(string(pairs0[x+1])))
+						fmt.Printf("%s", strings.ToLower(string(g.dataTables.pairs0[x+1])))
 					}
 					break
 				default:
@@ -373,55 +413,52 @@ func goatSoup(source string, psy *planetarySystem) {
 	}
 }
 
-func printSystem(plsy planetarySystem, compressed bool) {
+func (g *galaxy) printSystem(plsy planetarySystem, compressed bool) {
 
 	if compressed {
 		fmt.Printf("%10s", plsy.name)
 		fmt.Printf(" TL: %2d ", (plsy.techlev)+1)
-		fmt.Printf("%12s", econnames[plsy.economy])
-		fmt.Printf(" %15s", govnames[plsy.govtype])
+		fmt.Printf("%12s", g.dataTables.econnames[plsy.economy])
+		fmt.Printf(" %15s", g.dataTables.govnames[plsy.govtype])
 	} else {
 		fmt.Printf("\n\nSystem:  ")
 		fmt.Printf(plsy.name)
 		fmt.Printf("\nPosition (%d,", plsy.x)
 		fmt.Printf("%d)", plsy.y)
 		fmt.Printf("\nEconomy: (%d) ", plsy.economy)
-		fmt.Printf(econnames[plsy.economy])
+		fmt.Printf(g.dataTables.econnames[plsy.economy])
 		fmt.Printf("\nGovernment: (%d) ", plsy.govtype)
-		fmt.Printf(govnames[plsy.govtype])
+		fmt.Printf(g.dataTables.govnames[plsy.govtype])
 		fmt.Printf("\nTech Level: %2d", (plsy.techlev)+1)
 		fmt.Printf("\nTurnover: %d", (plsy.productivity))
 		fmt.Printf("\nRadius: %d", plsy.radius)
 		fmt.Printf("\nPopulation: %d Billion", (plsy.population)>>3)
 
-		rnd_seed = plsy.goatsoupseed
+		g.prng.rnd_seed = plsy.goatsoupseed
 		fmt.Println()
-		goatSoup("\x8F is \x97.", &plsy)
+		g.goatSoup("\x8F is \x97.", &plsy)
 		fmt.Println()
 
 	}
 }
 
 func main() {
-	// Init things
-	mysrand(12345)
 
-	galaxynum := 1
-	buildGalaxy(galaxynum)
-	currentPlanet = 7 // Lave
-	debugTests()
+	galaxy := initGalaxy()
+	debugTests(galaxy)
 
 }
 
-func debugTests() {
+func debugTests(gal galaxy) {
 
-	fmt.Printf("The current system is: %s", galaxy[currentPlanet].name)
+	fmt.Printf("The current system is: %s", gal.systems[gal.currentPlanet].name)
 	// test current planet (Lave at start)
-	printSystem(galaxy[currentPlanet], false)
+	gal.printSystem(gal.systems[gal.currentPlanet], false)
 	fmt.Println()
 	// test matchsys
-	fmt.Printf("DISO is system numner: %d", matchsys("DISO")) // 147
+	fmt.Printf("DISO is system numner: %d", gal.matchsys("DISO")) // 147
 
-	diso := matchsys("DISO")
-	printSystem(galaxy[diso], false)
+	diso := gal.matchsys("DISO")
+	gal.printSystem(gal.systems[diso], false)
+
 }
