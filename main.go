@@ -8,17 +8,22 @@ import (
 
 func main() {
 
-	galaxy := engine.InitGalaxy(1)
-	debugTests(galaxy)
+	game := engine.InitGame()
+	debugTests(game)
 
 }
 
-func debugTests(gal engine.Galaxy) {
+func debugTests(game engine.Game) {
 
-	fmt.Printf("The current system is: %s", gal.Systems[gal.CurrentPlanet].Name)
+	gal := game.Galaxy
+	shipLocation := game.PlayerShip.Location
+
+	fmt.Printf("Ship is currently at: %s in galaxy %d", gal.Systems[shipLocation.CurrentPlanet].Name, shipLocation.CurrentGalaxy)
+
 	// test current planet (Lave at start)
-	gal.PrintSystem(gal.Systems[gal.CurrentPlanet], false)
+	gal.PrintSystem(gal.Systems[shipLocation.CurrentPlanet], false)
 	fmt.Println()
+
 	// test matchsys
 	fmt.Printf("DISO is system numner: %d", gal.Matchsys("DISO")) // 147
 

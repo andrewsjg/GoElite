@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestGalaxy(t *testing.T) {
-	galaxy := InitGalaxy(1)
+func TestGalaxyOne(t *testing.T) {
+	galaxy := initGalaxy(1)
 
 	if strings.Compare(strings.ToUpper(galaxy.Systems[7].Name), "LAVE") == 0 {
 		t.Error("System number 7 in galaxy 1 should be LAVE. Got:", galaxy.Systems[7].Name)
