@@ -18,9 +18,6 @@ type Market struct {
 	UnitNames []string
 }
 
-// TODO: Will be added to the markets structures when I add them
-//var unitnames = []string{"t", "kg", "g"}
-
 func initCommodities(politicallCorrect bool) []TradeGood {
 	commodities := []TradeGood{}
 

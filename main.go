@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	game := engine.InitGame()
+	game := engine.InitGame(false)
 	debugTests(game)
 
 }

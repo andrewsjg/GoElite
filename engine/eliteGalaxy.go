@@ -26,17 +26,17 @@ type seed struct {
 }
 
 type planetarySystem struct {
-	X            uint16
-	Y            uint16 /* One byte unsigned */
-	Economy      uint16 /* These two are actually only 0-7  */
-	Govtype      uint16
-	Techlev      uint16 /* 0-16 i think */
-	Population   uint16 /* One byte */
-	Productivity uint16 /* Two byte */
-	Radius       uint16 /* Two byte (not used by game at all) */
-	goatsoupseed fastseed
-	Name         string
-	LocalMarket  Market
+	X                 uint16
+	Y                 uint16 /* One byte unsigned */
+	Economy           uint16 /* These two are actually only 0-7  */
+	Govtype           uint16
+	Techlev           uint16 /* 0-16 i think */
+	Population        uint16 /* One byte */
+	Productivity      uint16 /* Two byte */
+	Radius            uint16 /* Two byte (not used by game at all) */
+	goatsoupseed      fastseed
+	Name              string
+	marketFluctuation uint16
 }
 
 type Galaxy struct {
@@ -436,5 +436,64 @@ func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
 		g.goatSoup("\x8F is \x97.", &plsy)
 		fmt.Println()
 
+	}
+}
+
+/* Prices and availabilities are influenced by the planet's economy type
+   (0-7) and a random "fluctuation" byte that was kept within the saved
+   commander position to keep the market prices constant over gamesaves.
+   Availabilities must be saved with the game since the player alters them
+   by buying (and selling(?))
+
+   Almost all operations are one byte only and overflow "errors" are
+   extremely frequent and exploited.
+
+   Trade Item prices are held internally in a single byte=true value/4.
+   The decimal point in prices is introduced only when printing them.
+   Internally, all prices are integers.
+   The player's cash is held in four bytes.
+*/
+
+func (p *planetarySystem) market(commodities []TradeGood) Market {
+	mkt := Market{}
+	mkt.UnitNames = []string{"t", "kg", "g"}
+
+	numCommodities := len(commodities)
+	AlienItemsIdx := 16
+
+	for i := 0; i <= numCommodities; i++ {
+		product := int16((p.Economy)) * (commodities[i].Gradient)
+		changing := int16(p.marketFluctuation & (commodities[i].Maskbyte))
+		q := int16((commodities[i].Basequant)) + changing - product
+		q = q & 0xFF
+
+		// Clip to positive 8-bit
+		if q&0x80 == 1 {
+			q = 0
+		}
+
+		mkt.Quantity[i] = uint16(q & 0x3F) // Mask to 6-bits
+
+		q = int16((commodities[i].Baseprice)) + changing - product
+		q = q & 0xFF
+
+		mkt.Price[i] = uint16(q * 4)
+	}
+
+	mkt.Quantity[AlienItemsIdx] = 0 // Override to force nonavailability
+
+	return mkt
+}
+
+func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
+	numCommodities := len(commodities)
+	mkt := p.market(commodities)
+
+	for i := 0; i <= numCommodities; i++ {
+		fmt.Println()
+		fmt.Printf(commodities[i].Name)
+		fmt.Printf("   %.1f", float64(mkt.Price[i]/10))
+		fmt.Printf("   %d", mkt.Quantity[i])
+		fmt.Printf(mkt.UnitNames[commodities[1].Units])
 	}
 }
