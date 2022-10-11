@@ -1,9 +1,17 @@
 package eliteEngine
 
-import "math/rand"
+import (
+	"fmt"
+	"math/rand"
+)
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
 // Core game function
+
+type player struct {
+	Ship ship
+	Cash int16
+}
 
 type shipLocation struct {
 	CurrentPlanet int
@@ -18,8 +26,9 @@ type ship struct {
 }
 
 type Game struct {
-	Galaxy        Galaxy
-	PlayerShip    ship
+	Galaxy Galaxy
+	//PlayerShip    ship
+	Player        player
 	maxFuel       uint16
 	fuelCost      uint16
 	lastrand      uint
@@ -47,6 +56,7 @@ func (g *Game) randByte() uint {
 func InitGame(useNativeRand bool) Game {
 	game := Game{}
 	ship := ship{}
+	player := player{}
 
 	game.maxFuel = 70 // 7 Light Year tank
 	game.fuelCost = 2 // 0.2 CR/Light year
@@ -63,14 +73,58 @@ func InitGame(useNativeRand bool) Game {
 	ship.Location.CurrentGalaxy = game.Galaxy.galaxyNum
 	ship.Location.CurrentPlanet = game.Galaxy.CurrentPlanet
 
+	player.Ship = ship
+	player.Cash = 1000
+
 	// Seed the local market. This needs to be done on each jump
 	game.Galaxy.Systems[ship.Location.CurrentPlanet].marketFluctuation = 0
 
-	game.PlayerShip = ship
+	game.Player = player
 	game.AlienItems = 16 // Number of commodities per market
 	game.Commodities = initCommodities(true)
 	game.lastrand = 0
 	game.useNativeRand = useNativeRand
 
 	return game
+}
+
+// Game functions
+
+func (g *Game) Jump(planetName string) {
+	dest := g.Galaxy.Matchsys(planetName)
+
+	if dest == g.Player.Ship.Location.CurrentPlanet {
+		fmt.Println("Bad Jump")
+		return
+	}
+
+	dist := distance(g.Galaxy.Systems[dest], g.Galaxy.Systems[g.Player.Ship.Location.CurrentPlanet])
+
+	fmt.Printf("Jump Distance: %d\n", dist)
+	fmt.Printf("Current Fuel: %d\n", g.Player.Ship.Fuel)
+	if dist > int(g.Player.Ship.Fuel) {
+		fmt.Println("To far to jump. Not enough fuel")
+		return
+	}
+
+	g.Player.Ship.Fuel = g.Player.Ship.Fuel - uint16(dist)
+	g.Player.Ship.Location.CurrentPlanet = dest
+	g.Galaxy.Systems[dest].marketFluctuation = uint16(g.randByte())
+}
+
+// Print out the current state of the game. Mostly for debug
+func (g *Game) PrintState() {
+	gal := g.Galaxy
+	shipLocation := g.Player.Ship.Location
+	planet := gal.Systems[shipLocation.CurrentPlanet]
+
+	fmt.Printf("Current System is: %s", planet.Name)
+	g.Galaxy.PrintSystem(planet, false)
+	fmt.Println()
+	planet.PrintMarket(g.Commodities)
+	fmt.Println()
+	fmt.Printf("Cash: \t\t%.1f\n", float64(g.Player.Cash)/float64(10))
+	fmt.Printf("Fuel: \t\t%.1f\n", float64(g.Player.Ship.Fuel)/float64(10))
+	fmt.Printf("Hold Space: \t%dt\n", g.Player.Ship.Holdspace)
+
 }

@@ -283,9 +283,10 @@ func (g *Galaxy) Matchsys(platnetName string) int {
 // Seperation between two planets (4*sqrt(X*X+Y*Y/4))
 func distance(planetA planetarySystem, planetB planetarySystem) int {
 
-	val := (float64((planetA.X-planetB.X)*(planetA.X-planetB.X) + (planetA.Y-planetB.Y)*(planetA.Y-planetB.Y))) / 4.0
+	val := (planetA.X-planetB.X)*(planetA.X-planetB.X) + (planetA.Y-planetB.Y)*(planetA.Y-planetB.Y)/4.0
 
-	return int(4 * math.Sqrt(val))
+	return int(4 * math.Sqrt(float64(val)))
+	//return int(val)
 }
 
 func (g *Galaxy) goatSoup(source string, psy *planetarySystem) {

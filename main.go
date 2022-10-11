@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	engine "github.com/andrewsjg/GoElite/engine"
 )
 
@@ -15,8 +13,8 @@ func main() {
 
 func debugTests(game engine.Game) {
 
-	gal := game.Galaxy
-	shipLocation := game.PlayerShip.Location
+	/*gal := game.Galaxy
+	shipLocation := game.Player.Ship.Location
 	currentPlanet := gal.Systems[shipLocation.CurrentPlanet]
 
 	fmt.Printf("Ship is currently at: %s in galaxy %d", gal.Systems[shipLocation.CurrentPlanet].Name, shipLocation.CurrentGalaxy)
@@ -27,5 +25,12 @@ func debugTests(game engine.Game) {
 
 	// Print the local Market
 	fmt.Println()
-	currentPlanet.PrintMarket(game.Commodities)
+	currentPlanet.PrintMarket(game.Commodities) */
+
+	// Initial State
+	game.PrintState()
+
+	// Jump to DISO
+	game.Jump("DISO")
+	game.PrintState()
 }
