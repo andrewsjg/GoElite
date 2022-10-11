@@ -286,7 +286,6 @@ func distance(planetA planetarySystem, planetB planetarySystem) int {
 	val := (planetA.X-planetB.X)*(planetA.X-planetB.X) + (planetA.Y-planetB.Y)*(planetA.Y-planetB.Y)/4.0
 
 	return int(4 * math.Sqrt(float64(val)))
-	//return int(val)
 }
 
 func (g *Galaxy) goatSoup(source string, psy *planetarySystem) {
