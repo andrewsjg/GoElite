@@ -33,7 +33,7 @@ func TestGetCommodityIdx(t *testing.T) {
 
 func TestLaveMarketState(t *testing.T) {
 	game := InitGame(false)
-	market := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].market(game.Commodities)
+	market := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].Market
 
 	commodityName := "alloys"
 	alloyIdx := getCommodityIdx(commodityName, game.Commodities)
@@ -53,7 +53,7 @@ func TestLaveMarketState(t *testing.T) {
 
 func TestMarketBuy(t *testing.T) {
 	game := InitGame(false)
-	market := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].market(game.Commodities)
+	market := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].Market
 
 	commodityName := "alloys"
 	alloyIdx := getCommodityIdx(commodityName, game.Commodities)

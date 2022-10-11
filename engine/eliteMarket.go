@@ -77,7 +77,7 @@ func (g *Game) BuyCommodity(commodity string, amount int) (bought int, err error
 	err = nil
 
 	// All these dots feel wrong?
-	market := g.Galaxy.Systems[g.Player.Ship.Location.CurrentPlanet].market(g.Commodities)
+	market := g.Galaxy.Systems[g.Player.Ship.Location.CurrentPlanet].Market
 	commodityIdx := getCommodityIdx(commodity, g.Commodities)
 
 	// Didnt find the commodity is the game commodities list
@@ -129,7 +129,7 @@ func getCommodityIdx(commodity string, commodities []TradeGood) int {
 
 func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 	numCommodities := len(commodities) - 1
-	mkt := p.market(commodities)
+	mkt := p.Market
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 5, ' ', 0)
 
 	fmt.Fprintln(w, "Local Market")
@@ -149,8 +149,9 @@ func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 
 }
 
-func (p *planetarySystem) market(commodities []TradeGood) Market {
+func (p *planetarySystem) generateMarket(commodities []TradeGood, marketFluctuation uint16) {
 	mkt := Market{}
+
 	mkt.Quantity = make([]uint16, len(commodities))
 	mkt.Price = make([]uint16, len(commodities))
 
@@ -161,7 +162,7 @@ func (p *planetarySystem) market(commodities []TradeGood) Market {
 
 	for i := 0; i <= numCommodities; i++ {
 		product := int16((p.Economy)) * (commodities[i].Gradient)
-		changing := int16(p.marketFluctuation & (commodities[i].Maskbyte))
+		changing := int16(marketFluctuation & (commodities[i].Maskbyte))
 		q := int16((commodities[i].Basequant)) + changing - product
 		q = q & 0xFF
 
@@ -181,7 +182,7 @@ func (p *planetarySystem) market(commodities []TradeGood) Market {
 
 	mkt.Quantity[AlienItemsIdx] = 0 // Override to force nonavailability
 
-	return mkt
+	p.Market = mkt
 }
 
 /*

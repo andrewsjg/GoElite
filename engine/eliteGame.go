@@ -84,11 +84,12 @@ func InitGame(useNativeRand bool) Game {
 	player.Ship = ship
 	player.Cash = 1000
 
-	// Seed the local market. This needs to be done on each jump
-	game.Galaxy.Systems[ship.Location.CurrentPlanet].marketFluctuation = 0
+	game.Commodities = initCommodities(true)
+
+	// Generate the local market. This needs to be done on each jump
+	game.Galaxy.Systems[ship.Location.CurrentPlanet].generateMarket(game.Commodities, 0)
 
 	game.Player = player
-	game.Commodities = initCommodities(true)
 	game.lastrand = 0
 	game.useNativeRand = useNativeRand
 
@@ -117,7 +118,11 @@ func (g *Game) Jump(planetName string) {
 
 	g.Player.Ship.Fuel = g.Player.Ship.Fuel - uint16(dist)
 	g.Player.Ship.Location.CurrentPlanet = dest
-	g.Galaxy.Systems[dest].marketFluctuation = uint16(g.randByte())
+
+	newSystem := g.Galaxy.Systems[dest]
+	// Generate the local market. This is a bit ugly
+	newSystem.generateMarket(g.Commodities, uint16(g.randByte()))
+
 }
 
 // Jump to a new Galaxy

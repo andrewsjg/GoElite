@@ -26,17 +26,17 @@ type seed struct {
 }
 
 type planetarySystem struct {
-	X                 uint16
-	Y                 uint16 /* One byte unsigned */
-	Economy           uint16 /* These two are actually only 0-7  */
-	Govtype           uint16
-	Techlev           uint16 /* 0-16 i think */
-	Population        uint16 /* One byte */
-	Productivity      uint16 /* Two byte */
-	Radius            uint16 /* Two byte (not used by game at all) */
-	goatsoupseed      fastseed
-	Name              string
-	marketFluctuation uint16
+	X            uint16
+	Y            uint16 /* One byte unsigned */
+	Economy      uint16 /* These two are actually only 0-7  */
+	Govtype      uint16
+	Techlev      uint16 /* 0-16 i think */
+	Population   uint16 /* One byte */
+	Productivity uint16 /* Two byte */
+	Radius       uint16 /* Two byte (not used by game at all) */
+	goatsoupseed fastseed
+	Name         string
+	Market       Market
 }
 
 type Galaxy struct {
