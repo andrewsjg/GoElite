@@ -110,10 +110,50 @@ func (g *Game) BuyCommodity(commodity string, amount int) (bought int, err error
 	// Deduct the amount from the market
 	market.Quantity[commodityIdx] = market.Quantity[commodityIdx] - uint16(amount)
 
+	// Deduct the amount spent from players cash
+	g.Player.Cash = g.Player.Cash - (int16(market.Price[commodityIdx]) * int16(amount))
+
 	bought = amount
 	err = nil
 
 	return bought, err
+}
+
+func (g *Game) SellCommodity(commodity string, amount int) (sold int, err error) {
+	sold = 0
+	err = nil
+
+	// All these dots feel wrong?
+	market := g.Galaxy.Systems[g.Player.Ship.Location.CurrentPlanet].Market
+	commodityIdx := getCommodityIdx(commodity, g.Commodities)
+
+	// Didnt find the commodity is the game commodities list
+	if commodityIdx == -1 {
+		return 0, errors.New("no such commodity")
+	}
+
+	// Not enough to buy
+	if g.Player.Ship.Hold[commodityIdx] < uint16(amount) {
+		return 0, errors.New("not enough of " + commodity + " in the ships hold to sell")
+	}
+
+	// Everything is in order. Do the trade
+	// Remove the amount of the commodity from the ships hold
+	g.Player.Ship.Hold[commodityIdx] = g.Player.Ship.Hold[commodityIdx] - uint16(amount)
+
+	// Add the space from the ships hold space
+	g.Player.Ship.Holdspace = g.Player.Ship.Holdspace + uint16(amount)
+
+	// Add the amount to the market
+	market.Quantity[commodityIdx] = market.Quantity[commodityIdx] + uint16(amount)
+
+	// add the amount earnt to the players cash
+	g.Player.Cash = g.Player.Cash + (int16(market.Price[commodityIdx]) * int16(amount))
+
+	sold = amount
+	err = nil
+
+	return sold, err
 }
 
 // Helper function to get the index of a commodity in the market
@@ -167,7 +207,7 @@ func (p *planetarySystem) generateMarket(commodities []TradeGood, marketFluctuat
 		q = q & 0xFF
 
 		// Clip to positive 8-bit
-		// TODO: Not sure about this. Keep screwing up the bit-wise oprations
+		// NOTE: Not sure about this. Keep screwing up the bit-wise oprations
 		if q&0x80 == 128 {
 			q = 0
 		}
@@ -180,94 +220,7 @@ func (p *planetarySystem) generateMarket(commodities []TradeGood, marketFluctuat
 		mkt.Price[i] = uint16(q * 4)
 	}
 
-	mkt.Quantity[AlienItemsIdx] = 0 // Override to force nonavailability
+	mkt.Quantity[AlienItemsIdx] = 0 // NOTE: Why? Override to force nonavailability.
 
 	p.Market = mkt
 }
-
-/*
-
-uint gamebuy(uint i, uint a)
- // Try to buy ammount a  of good i  Return ammount bought
- // Cannot buy more than is availble, can afford, or will fit in hold
- {   uint t;
-    if(cash<0) t=0;
-    else
-    {	t=mymin(localmarket.quantity[i],a);
-    	if ((commodities[i].units)==tonnes) {t = mymin(holdspace,t);}
-    	t = mymin(t, (uint)floor((double)cash/(localmarket.price[i])));
-    }
-		shipshold[i]+=t;
-    localmarket.quantity[i]-=t;
-    cash-=t*(localmarket.price[i]);
-    if ((commodities[i].units)==tonnes) {holdspace-=t;}
-		return t;
-}
-
-uint gamesell(uint i,uint a) // As gamebuy but selling
-{   uint t=mymin(shipshold[i],a);
-    shipshold[i]-=t;
-    localmarket.quantity[i]+=t;
-    if ((commodities[i].units)==tonnes) {holdspace+=t;}
-    cash+=t*(localmarket.price[i]);
-    return t;
-}
-
-
-boolean dohold(char *s)
-{	uint a=(uint)atoi(s),t=0,i;
-  for(i=0;i<=lasttrade;++i)
-  {	if ((commodities[i].units)==tonnes) t+=shipshold[i];
-  }
-  if(t>a) {printf("\nHold too full"); return false;}
-  holdspace=a-t;
-  return true;
-}
-
-boolean dosell(char *s) // Sell ammount S(2) of good S(1)
-{	uint i,a,t;
-  char s2[maxlen];
-  spacesplit(s,s2);
-  a=(uint)atoi(s);
-  if (a==0) {a=1;}
-  i=stringmatch(s2,tradnames,lasttrade+1);
-  if(i==0) { printf("\nUnknown trade good"); return false; }
-  i-=1;
-
-  t=gamesell(i,a);
-
-  if(t==0) { printf("Cannot sell any "); }
-  else
-  {	printf("\nSelling %i",t);
-    printf(unitnames[commodities[i].units]);
-    printf(" of ");
-  }
-    printf(tradnames[i]);
-
-    return true;
-
-}
-
-
-boolean dobuy(char *s) // Buy ammount S(2) of good S(1)
-{	uint i,a,t;
-  char s2[maxlen];
-  spacesplit(s,s2);
-	a=(uint)atoi(s);
-  if (a==0) a=1;
-	i=stringmatch(s2,tradnames,lasttrade+1);
-  if(i==0) { printf("\nUnknown trade good"); return false; }
-  i-=1;
-
-  t=gamebuy(i,a);
-	if(t==0) printf("Cannot buy any ");
-  else
-  { printf("\nBuying %i",t);
-    printf(unitnames[commodities[i].units]);
-    printf(" of ");
-  }
-  printf(tradnames[i]);
-  return true;
-}
-
-*/

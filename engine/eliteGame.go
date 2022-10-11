@@ -71,7 +71,7 @@ func InitGame(useNativeRand bool) Game {
 
 	// TODO: Fix this so its configurable
 	ship.Hold = make([]uint16, game.AlienItems+1)
-	ship.Holdspace = uint16(len(ship.Hold))
+	ship.Holdspace = 20 //uint16(len(ship.Hold))
 	ship.Fuel = game.maxFuel
 
 	game.Galaxy = initGalaxy(1)

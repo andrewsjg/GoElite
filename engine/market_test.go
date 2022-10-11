@@ -51,7 +51,7 @@ func TestLaveMarketState(t *testing.T) {
 
 }
 
-func TestMarketBuy(t *testing.T) {
+func TestMarketBuySell(t *testing.T) {
 	game := InitGame(false)
 	market := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].Market
 
@@ -62,11 +62,58 @@ func TestMarketBuy(t *testing.T) {
 		t.Error("Expected LAVE to have 12t of Alloys. Got:", market.Quantity[alloyIdx])
 	}
 
+	// Check the  starting values are correct
+	if game.Player.Cash != 1000 {
+		t.Error("Expected Player to have 1000 cash. Got:", game.Player.Cash)
+	}
+
+	if game.Player.Ship.Holdspace != 20 {
+		t.Error("Expected ship to have 20 holdspace. Got:", game.Player.Ship.Holdspace)
+	}
+
 	// Buy 2 tonnes of alloys
 	game.BuyCommodity(commodityName, 2)
 
 	if market.Quantity[alloyIdx] != 10 {
 		t.Error("Expected LAVE to have 10t of Alloys. Got:", market.Quantity[alloyIdx])
+	}
+
+	if game.Player.Cash != 336 {
+		t.Error("Expected Player to have 336 cash. Got:", game.Player.Cash)
+	}
+
+	if game.Player.Ship.Hold[9] != 2 {
+		t.Error("Expected ships hold to have 2t of Alloys. Got:", game.Player.Ship.Hold[9])
+	}
+
+	if game.Player.Ship.Holdspace != 18 {
+		t.Error("Expected ship to have 18 holdspace. Got:", game.Player.Ship.Holdspace)
+	}
+
+	// Sell 2 tonnes of alloys
+
+	game.SellCommodity(commodityName, 2)
+
+	if market.Quantity[alloyIdx] != 12 {
+		t.Error("Expected LAVE to have 12t of Alloys. Got:", market.Quantity[alloyIdx])
+	}
+
+	if game.Player.Cash != 1000 {
+		t.Error("Expected Player to have 1000 cash. Got:", game.Player.Cash)
+	}
+
+	if game.Player.Ship.Hold[9] != 0 {
+		t.Error("Expected ships hold to have 0t of Alloys. Got:", game.Player.Ship.Hold[9])
+	}
+
+	if game.Player.Ship.Holdspace != 20 {
+		t.Error("Expected ship to have 20 holdspace. Got:", game.Player.Ship.Holdspace)
+	}
+
+	// Try to sell something we dont have
+	_, err := game.SellCommodity(commodityName, 2)
+	if err == nil {
+		t.Error("Attempted to sell a commodity we dont have. No error raised")
 	}
 
 }
