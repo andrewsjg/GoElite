@@ -37,6 +37,13 @@ type Game struct {
 	Commodities   []TradeGood
 }
 
+type NavInfo struct {
+	System                   planetarySystem
+	ReachableWithMaxFuel     bool
+	ReachableWithCurrentFuel bool
+	Distance                 int
+}
+
 func (g *Game) gameRand() uint {
 
 	if g.useNativeRand {
@@ -90,6 +97,7 @@ func InitGame(useNativeRand bool) Game {
 
 // Game functions
 
+// TODO: Probably want this to return an error rather than printing things out
 func (g *Game) Jump(planetName string) {
 	dest := g.Galaxy.Matchsys(planetName)
 
@@ -112,6 +120,69 @@ func (g *Game) Jump(planetName string) {
 	g.Galaxy.Systems[dest].marketFluctuation = uint16(g.randByte())
 }
 
+// Jump to a new Galaxy
+func (g *Game) HyperSpaceJump() {
+
+	g.Galaxy.galaxyNum = g.Galaxy.galaxyNum + 1
+
+	if g.Galaxy.galaxyNum == 9 {
+		g.Galaxy.galaxyNum = 1
+	}
+
+	g.Galaxy.buildGalaxy(g.Galaxy.galaxyNum)
+}
+
+// Show local systems. Replicates the orginal functionality.
+func (g *Game) ShowLocal() {
+	fmt.Printf("Galaxy Number: %d", g.Galaxy.galaxyNum)
+
+	reachable := g.ReachableSystems()
+
+	for _, navinfo := range reachable {
+		if navinfo.ReachableWithCurrentFuel {
+			fmt.Printf("\n *")
+		} else {
+			fmt.Printf("\n - ")
+		}
+		g.Galaxy.PrintSystem(navinfo.System, true)
+		fmt.Printf(" (%.1f LY)", float64(navinfo.Distance)/float64(10))
+	}
+
+	fmt.Println()
+}
+
+// Return and array of reachable systems
+func (g *Game) ReachableSystems() []NavInfo {
+	reachable := []NavInfo{}
+
+	currentPlanent := g.Galaxy.Systems[g.Player.Ship.Location.CurrentPlanet]
+
+	for syscount := 0; syscount < g.Galaxy.Size; syscount++ {
+
+		dist := distance(g.Galaxy.Systems[syscount], currentPlanent)
+
+		if dist <= int(g.maxFuel) {
+			nav := NavInfo{}
+
+			if dist <= int(g.Player.Ship.Fuel) {
+				nav.ReachableWithCurrentFuel = true
+				nav.ReachableWithMaxFuel = true
+			} else {
+				nav.ReachableWithCurrentFuel = false
+				nav.ReachableWithMaxFuel = true
+			}
+
+			nav.System = g.Galaxy.Systems[syscount]
+			nav.Distance = dist
+
+			reachable = append(reachable, nav)
+		}
+	}
+
+	return reachable
+
+}
+
 // Print out the current state of the game. Mostly for debug
 func (g *Game) PrintState() {
 	gal := g.Galaxy
@@ -125,6 +196,6 @@ func (g *Game) PrintState() {
 	fmt.Println()
 	fmt.Printf("Cash: \t\t%.1f\n", float64(g.Player.Cash)/float64(10))
 	fmt.Printf("Fuel: \t\t%.1f\n", float64(g.Player.Ship.Fuel)/float64(10))
-	fmt.Printf("Hold Space: \t%dt\n", g.Player.Ship.Holdspace)
+	fmt.Printf("Hold Space: \t%dt\n\n", g.Player.Ship.Holdspace)
 
 }

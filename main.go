@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	engine "github.com/andrewsjg/GoElite/engine"
 )
 
@@ -33,4 +35,9 @@ func debugTests(game engine.Game) {
 	// Jump to DISO
 	game.Jump("DISO")
 	game.PrintState()
+
+	game.ShowLocal()
+	fmt.Printf("\nDoing Hyperspace Jump\n\n")
+	game.HyperSpaceJump()
+	game.ShowLocal()
 }

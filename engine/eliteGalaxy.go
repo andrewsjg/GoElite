@@ -187,7 +187,7 @@ func (g *Galaxy) buildGalaxy(galaxyNum int) {
 func (g *Galaxy) makeSystem(s *seed) planetarySystem {
 
 	var pair1, pair2, pair3, pair4 uint16
-	var longnameflag uint16 = (s.w0) & 64
+	var longnameflag uint16 = (s.w0) & 0x40
 
 	planSys := planetarySystem{}
 
@@ -235,7 +235,7 @@ func (g *Galaxy) makeSystem(s *seed) planetarySystem {
 	g.prng.tweakseed(s)
 	/* Always four iterations of random number */
 
-	name := make([]byte, 8)
+	name := make([]byte, 9)
 
 	name[0] = g.dataTables.pairs[pair1]
 	name[1] = g.dataTables.pairs[pair1+1]
@@ -245,10 +245,11 @@ func (g *Galaxy) makeSystem(s *seed) planetarySystem {
 	name[5] = g.dataTables.pairs[pair3+1]
 
 	/* bit 6 of ORIGINAL w0 flags a four-pair name */
-	if longnameflag == 1 {
+	if longnameflag == 64 {
 		name[6] = g.dataTables.pairs[pair4]
 		name[7] = g.dataTables.pairs[pair4+1]
 		name[8] = 0
+
 	} else {
 		name[6] = 0
 	}
@@ -415,7 +416,7 @@ func (g *Galaxy) goatSoup(source string, psy *planetarySystem) {
 func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
 
 	if compressed {
-		fmt.Printf("%10s", plsy.Name)
+		fmt.Printf("%10s\t", plsy.Name)
 		fmt.Printf(" TL: %2d ", (plsy.Techlev)+1)
 		fmt.Printf("%12s", g.dataTables.econnames[plsy.Economy])
 		fmt.Printf(" %15s", g.dataTables.govnames[plsy.Govtype])
@@ -473,7 +474,8 @@ func (p *planetarySystem) market(commodities []TradeGood) Market {
 		q = q & 0xFF
 
 		// Clip to positive 8-bit
-		if q&0x80 == 1 {
+		// TODO: Not sure about this. Keep screwing up the bit-wise oprations
+		if q&0x80 == 128 {
 			q = 0
 		}
 
