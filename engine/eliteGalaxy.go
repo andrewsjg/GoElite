@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"os"
 	"strings"
+	"text/tabwriter"
 )
 
 // four byte random number used for planet description
@@ -456,9 +458,12 @@ func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
 
 func (p *planetarySystem) market(commodities []TradeGood) Market {
 	mkt := Market{}
+	mkt.Quantity = make([]uint16, len(commodities))
+	mkt.Price = make([]uint16, len(commodities))
+
 	mkt.UnitNames = []string{"t", "kg", "g"}
 
-	numCommodities := len(commodities)
+	numCommodities := len(commodities) - 1
 	AlienItemsIdx := 16
 
 	for i := 0; i <= numCommodities; i++ {
@@ -474,7 +479,7 @@ func (p *planetarySystem) market(commodities []TradeGood) Market {
 
 		mkt.Quantity[i] = uint16(q & 0x3F) // Mask to 6-bits
 
-		q = int16((commodities[i].Baseprice)) + changing - product
+		q = int16((commodities[i].Baseprice)) + changing + product
 		q = q & 0xFF
 
 		mkt.Price[i] = uint16(q * 4)
@@ -486,14 +491,23 @@ func (p *planetarySystem) market(commodities []TradeGood) Market {
 }
 
 func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
-	numCommodities := len(commodities)
+	numCommodities := len(commodities) - 1
 	mkt := p.market(commodities)
+	w := tabwriter.NewWriter(os.Stdout, 0, 4, 5, ' ', 0)
 
+	fmt.Fprintln(w, "Local Market")
+	fmt.Fprintf(w, "Commodity\tPrice\tQuantity\n")
+	fmt.Fprintln(w, "------------------------------------")
 	for i := 0; i <= numCommodities; i++ {
-		fmt.Println()
-		fmt.Printf(commodities[i].Name)
-		fmt.Printf("   %.1f", float64(mkt.Price[i]/10))
-		fmt.Printf("   %d", mkt.Quantity[i])
-		fmt.Printf(mkt.UnitNames[commodities[1].Units])
+
+		fmt.Fprintf(w, commodities[i].Name)
+		fmt.Fprintf(w, "\t%.1f", float64(mkt.Price[i])/float64(10))
+		fmt.Fprintf(w, "\t%d", mkt.Quantity[i])
+		fmt.Fprintf(w, mkt.UnitNames[commodities[1].Units])
+		fmt.Fprintln(w, "")
+
 	}
+	w.Flush()
+	fmt.Println("------------------------------------")
+
 }

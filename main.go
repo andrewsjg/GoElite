@@ -17,17 +17,15 @@ func debugTests(game engine.Game) {
 
 	gal := game.Galaxy
 	shipLocation := game.PlayerShip.Location
+	currentPlanet := gal.Systems[shipLocation.CurrentPlanet]
 
 	fmt.Printf("Ship is currently at: %s in galaxy %d", gal.Systems[shipLocation.CurrentPlanet].Name, shipLocation.CurrentGalaxy)
 
-	// test current planet (Lave at start)
+	// Test current planet (Lave at start)
 	gal.PrintSystem(gal.Systems[shipLocation.CurrentPlanet], false)
 	fmt.Println()
 
-	// test matchsys
-	fmt.Printf("DISO is system numner: %d", gal.Matchsys("DISO")) // 147
-
-	diso := gal.Matchsys("DISO")
-	gal.PrintSystem(gal.Systems[diso], false)
-
+	// Print the local Market
+	fmt.Println()
+	currentPlanet.PrintMarket(game.Commodities)
 }
