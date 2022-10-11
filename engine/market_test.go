@@ -115,7 +115,6 @@ func TestMarketBuySell(t *testing.T) {
 	if err == nil {
 		t.Error("Attempted to sell a commodity we dont have. No error raised")
 	}
-
 }
 
 /*

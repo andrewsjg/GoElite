@@ -68,6 +68,57 @@ func initCommodities(politicallCorrect bool) []TradeGood {
 	return commodities
 }
 
+/* Prices and availabilities are influenced by the planet's economy type
+   (0-7) and a random "fluctuation" byte that was kept within the saved
+   commander position to keep the market prices constant over gamesaves.
+   Availabilities must be saved with the game since the player alters them
+   by buying (and selling(?))
+
+   Almost all operations are one byte only and overflow "errors" are
+   extremely frequent and exploited.
+
+   Trade Item prices are held internally in a single byte=true value/4.
+   The decimal point in prices is introduced only when printing them.
+   Internally, all prices are integers.
+   The player's cash is held in four bytes.
+*/
+
+func (p *planetarySystem) generateMarket(commodities []TradeGood, marketFluctuation uint16) {
+	mkt := Market{}
+
+	mkt.Quantity = make([]uint16, len(commodities))
+	mkt.Price = make([]uint16, len(commodities))
+
+	mkt.UnitNames = []string{"t", "kg", "g"}
+
+	numCommodities := len(commodities) - 1
+	AlienItemsIdx := 16
+
+	for i := 0; i <= numCommodities; i++ {
+		product := int16((p.Economy)) * (commodities[i].Gradient)
+		changing := int16(marketFluctuation & (commodities[i].Maskbyte))
+		q := int16((commodities[i].Basequant)) + changing - product
+		q = q & 0xFF
+
+		// Clip to positive 8-bit
+		// NOTE: Not sure about this. Keep screwing up the bit-wise oprations
+		if q&0x80 == 128 {
+			q = 0
+		}
+
+		mkt.Quantity[i] = uint16(q & 0x3F) // Mask to 6-bits
+
+		q = int16((commodities[i].Baseprice)) + changing + product
+		q = q & 0xFF
+
+		mkt.Price[i] = uint16(q * 4)
+	}
+
+	mkt.Quantity[AlienItemsIdx] = 0 // NOTE: Why? Override to force nonavailability.
+
+	p.Market = mkt
+}
+
 // Buy commodity from the local market
 // This isnt the same implementation as the C version, but should be functionally the same
 // TODO: Check if we need to deal with units properly
@@ -167,6 +218,28 @@ func getCommodityIdx(commodity string, commodities []TradeGood) int {
 	return -1
 }
 
+func (g *Game) BuyFuel(amount int16) error {
+
+	currentCapacity := g.maxFuel - g.Player.Ship.Fuel
+
+	// Check if affordable
+	if g.Player.Cash < int16(g.fuelCost)*amount {
+		return errors.New("not enough money to buy that much fuel")
+	}
+
+	if amount > int16(currentCapacity) {
+		amount = int16(currentCapacity)
+	}
+
+	// Add amount of fuel to the ship
+	g.Player.Ship.Fuel = g.Player.Ship.Fuel + uint16(amount)
+
+	// Deduct cost from player cash
+	g.Player.Cash = g.Player.Cash - (int16(g.fuelCost) - amount)
+
+	return nil
+}
+
 func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 	numCommodities := len(commodities) - 1
 	mkt := p.Market
@@ -187,55 +260,4 @@ func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 	w.Flush()
 	fmt.Println("------------------------------------")
 
-}
-
-/* Prices and availabilities are influenced by the planet's economy type
-   (0-7) and a random "fluctuation" byte that was kept within the saved
-   commander position to keep the market prices constant over gamesaves.
-   Availabilities must be saved with the game since the player alters them
-   by buying (and selling(?))
-
-   Almost all operations are one byte only and overflow "errors" are
-   extremely frequent and exploited.
-
-   Trade Item prices are held internally in a single byte=true value/4.
-   The decimal point in prices is introduced only when printing them.
-   Internally, all prices are integers.
-   The player's cash is held in four bytes.
-*/
-
-func (p *planetarySystem) generateMarket(commodities []TradeGood, marketFluctuation uint16) {
-	mkt := Market{}
-
-	mkt.Quantity = make([]uint16, len(commodities))
-	mkt.Price = make([]uint16, len(commodities))
-
-	mkt.UnitNames = []string{"t", "kg", "g"}
-
-	numCommodities := len(commodities) - 1
-	AlienItemsIdx := 16
-
-	for i := 0; i <= numCommodities; i++ {
-		product := int16((p.Economy)) * (commodities[i].Gradient)
-		changing := int16(marketFluctuation & (commodities[i].Maskbyte))
-		q := int16((commodities[i].Basequant)) + changing - product
-		q = q & 0xFF
-
-		// Clip to positive 8-bit
-		// NOTE: Not sure about this. Keep screwing up the bit-wise oprations
-		if q&0x80 == 128 {
-			q = 0
-		}
-
-		mkt.Quantity[i] = uint16(q & 0x3F) // Mask to 6-bits
-
-		q = int16((commodities[i].Baseprice)) + changing + product
-		q = q & 0xFF
-
-		mkt.Price[i] = uint16(q * 4)
-	}
-
-	mkt.Quantity[AlienItemsIdx] = 0 // NOTE: Why? Override to force nonavailability.
-
-	p.Market = mkt
 }
