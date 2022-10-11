@@ -65,11 +65,12 @@ func InitGame(useNativeRand bool) Game {
 	ship := ship{}
 	player := player{}
 
-	game.maxFuel = 70 // 7 Light Year tank
-	game.fuelCost = 2 // 0.2 CR/Light year
+	game.maxFuel = 70    // 7 Light Year tank
+	game.fuelCost = 2    // 0.2 CR/Light year
+	game.AlienItems = 16 // Number of commodities per market
 
 	// TODO: Fix this so its configurable
-	ship.Hold = make([]uint16, 20)
+	ship.Hold = make([]uint16, game.AlienItems+1)
 	ship.Holdspace = uint16(len(ship.Hold))
 	ship.Fuel = game.maxFuel
 
@@ -87,7 +88,6 @@ func InitGame(useNativeRand bool) Game {
 	game.Galaxy.Systems[ship.Location.CurrentPlanet].marketFluctuation = 0
 
 	game.Player = player
-	game.AlienItems = 16 // Number of commodities per market
 	game.Commodities = initCommodities(true)
 	game.lastrand = 0
 	game.useNativeRand = useNativeRand
