@@ -189,6 +189,21 @@ func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 
 }
 
+/* Prices and availabilities are influenced by the planet's economy type
+   (0-7) and a random "fluctuation" byte that was kept within the saved
+   commander position to keep the market prices constant over gamesaves.
+   Availabilities must be saved with the game since the player alters them
+   by buying (and selling(?))
+
+   Almost all operations are one byte only and overflow "errors" are
+   extremely frequent and exploited.
+
+   Trade Item prices are held internally in a single byte=true value/4.
+   The decimal point in prices is introduced only when printing them.
+   Internally, all prices are integers.
+   The player's cash is held in four bytes.
+*/
+
 func (p *planetarySystem) generateMarket(commodities []TradeGood, marketFluctuation uint16) {
 	mkt := Market{}
 

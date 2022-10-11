@@ -1,6 +1,7 @@
 package eliteEngine
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 )
@@ -69,7 +70,6 @@ func InitGame(useNativeRand bool) Game {
 	game.fuelCost = 2    // 0.2 CR/Light year
 	game.AlienItems = 16 // Number of commodities per market
 
-	// TODO: Fix this so its configurable
 	ship.Hold = make([]uint16, game.AlienItems+1)
 	ship.Holdspace = 20 //uint16(len(ship.Hold))
 	ship.Fuel = game.maxFuel
@@ -98,31 +98,26 @@ func InitGame(useNativeRand bool) Game {
 
 // Game functions
 
-// TODO: Probably want this to return an error rather than printing things out
-func (g *Game) Jump(planetName string) {
+func (g *Game) Jump(planetName string) error {
 	dest := g.Galaxy.Matchsys(planetName)
 
 	if dest == g.Player.Ship.Location.CurrentPlanet {
-		fmt.Println("Bad Jump")
-		return
+		return errors.New("bad jump")
 	}
 
 	dist := distance(g.Galaxy.Systems[dest], g.Galaxy.Systems[g.Player.Ship.Location.CurrentPlanet])
 
-	fmt.Printf("Jump Distance: %d\n", dist)
-	fmt.Printf("Current Fuel: %d\n", g.Player.Ship.Fuel)
 	if dist > int(g.Player.Ship.Fuel) {
-		fmt.Println("To far to jump. Not enough fuel")
-		return
+		return errors.New("to far to jump. Not enough fuel")
 	}
 
 	g.Player.Ship.Fuel = g.Player.Ship.Fuel - uint16(dist)
 	g.Player.Ship.Location.CurrentPlanet = dest
 
-	newSystem := g.Galaxy.Systems[dest]
 	// Generate the local market. This is a bit ugly
-	newSystem.generateMarket(g.Commodities, uint16(g.randByte()))
+	g.Galaxy.Systems[dest].generateMarket(g.Commodities, uint16(g.randByte()))
 
+	return nil
 }
 
 // Jump to a new Galaxy
@@ -138,7 +133,7 @@ func (g *Game) HyperSpaceJump() {
 }
 
 // Show local systems. Replicates the orginal functionality.
-func (g *Game) ShowLocal() {
+func (g *Game) PrintLocal() {
 	fmt.Printf("Galaxy Number: %d", g.Galaxy.galaxyNum)
 
 	reachable := g.ReachableSystems()
@@ -183,9 +178,12 @@ func (g *Game) ReachableSystems() []NavInfo {
 			reachable = append(reachable, nav)
 		}
 	}
-
 	return reachable
+}
 
+// Function that returns a planetary system record. Can be used for print system info
+func (g *Game) GetSystemData(systemName string) planetarySystem {
+	return g.Galaxy.Systems[g.Galaxy.Matchsys(systemName)]
 }
 
 // Print out the current state of the game. Mostly for debug

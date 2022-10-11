@@ -15,29 +15,22 @@ func main() {
 
 func debugTests(game engine.Game) {
 
-	/*gal := game.Galaxy
-	shipLocation := game.Player.Ship.Location
-	currentPlanet := gal.Systems[shipLocation.CurrentPlanet]
-
-	fmt.Printf("Ship is currently at: %s in galaxy %d", gal.Systems[shipLocation.CurrentPlanet].Name, shipLocation.CurrentGalaxy)
-
-	// Test current planet (Lave at start)
-	gal.PrintSystem(gal.Systems[shipLocation.CurrentPlanet], false)
-	fmt.Println()
-
-	// Print the local Market
-	fmt.Println()
-	currentPlanet.PrintMarket(game.Commodities) */
-
 	// Initial State
 	game.PrintState()
 
 	// Jump to DISO
-	game.Jump("DISO")
+	err := game.Jump("DISO")
+
+	if err != nil {
+		fmt.Println("Jump failed: " + err.Error())
+	}
+
 	game.PrintState()
 
-	game.ShowLocal()
+	game.PrintLocal()
+
 	fmt.Printf("\nDoing Hyperspace Jump\n\n")
 	game.HyperSpaceJump()
-	game.ShowLocal()
+
+	game.PrintLocal()
 }
