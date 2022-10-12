@@ -3,9 +3,10 @@ A Go version of TxtElite.
 
 Based off: http://www.iancgbell.clara.net/elite/text/
 
+## Done
 - Game Engine complete
 
-## TODO
+## Todo
 - CLI
 - TUI
 
