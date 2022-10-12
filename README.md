@@ -5,9 +5,9 @@ Based off: http://www.iancgbell.clara.net/elite/text/
 
 - Game Engine complete
 
-# TODO
+## TODO
 - CLI
 - TUI
 
-# Aspiratonal
+## Aspiratonal
 - 2D Game Engine
