@@ -202,3 +202,23 @@ func (g *Game) PrintState() {
 	fmt.Printf("Hold Space: \t%dt\n\n", g.Player.Ship.Holdspace)
 
 }
+
+// Return game state as a string
+func (g *Game) SprintState() string {
+
+	gameState := ""
+
+	gal := g.Galaxy
+	shipLocation := g.Player.Ship.Location
+	planet := gal.Systems[shipLocation.CurrentPlanet]
+
+	gameState = fmt.Sprintf("Current System is: %s", planet.Name)
+	gameState = gameState + g.Galaxy.SprintSystem(planet, false) + "\n"
+	gameState = gameState + planet.SprintMarket(g.Commodities) + "\n"
+	gameState = gameState + fmt.Sprintf("Cash: \t\t%.1f\n", float64(g.Player.Cash)/float64(10))
+	gameState = gameState + fmt.Sprintf("Fuel: \t\t%.1f\n", float64(g.Player.Ship.Fuel)/float64(10))
+	gameState = gameState + fmt.Sprintf("Hold Space: \t%dt\n\n", g.Player.Ship.Holdspace)
+
+	return gameState
+
+}

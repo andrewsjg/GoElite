@@ -1,6 +1,7 @@
 package eliteEngine
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -260,4 +261,31 @@ func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 	w.Flush()
 	fmt.Println("------------------------------------")
 
+}
+
+func (p *planetarySystem) SprintMarket(commodities []TradeGood) string {
+
+	marketData := ""
+	buf := bytes.NewBufferString(marketData)
+
+	numCommodities := len(commodities) - 1
+	mkt := p.Market
+	w := tabwriter.NewWriter(buf, 0, 4, 5, ' ', 0)
+
+	fmt.Fprintln(w, "Local Market")
+	fmt.Fprintf(w, "Commodity\tPrice\tQuantity\n")
+	fmt.Fprintln(w, "------------------------------------")
+	for i := 0; i <= numCommodities; i++ {
+
+		fmt.Fprintf(w, commodities[i].Name)
+		fmt.Fprintf(w, "\t%.1f", float64(mkt.Price[i])/float64(10))
+		fmt.Fprintf(w, "\t%d", mkt.Quantity[i])
+		fmt.Fprintf(w, mkt.UnitNames[commodities[1].Units])
+		fmt.Fprintln(w, "")
+
+	}
+	fmt.Fprintln(buf, "------------------------------------")
+	w.Flush()
+
+	return marketData
 }

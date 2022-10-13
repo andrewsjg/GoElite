@@ -45,7 +45,7 @@ type Galaxy struct {
 	Size          int
 	Systems       []planetarySystem
 
-	prng       galPRNG
+	prng       *galPRNG
 	dataTables planetDataTables
 }
 
@@ -97,7 +97,7 @@ func initGalaxy(galaxyNumber int) Galaxy {
 	galaxy.Size = 256        // Should pass this as a parameter?
 	galaxy.CurrentPlanet = 7 // Start at Lave. Should pass this as a parameter?
 	galaxy.galaxyNum = galaxyNumber
-	galaxy.prng = galRNG
+	galaxy.prng = &galRNG
 	galaxy.Systems = make([]planetarySystem, galaxy.Size)
 
 	// Populate the galaxy with planetary systems
@@ -411,6 +411,133 @@ func (g *Galaxy) goatSoup(source string, psy *planetarySystem) {
 	}
 }
 
+func (g *Galaxy) sgoatSoup(gs string, source string, psy *planetarySystem) string {
+
+	desc := [][]string{
+		{"fabled", "notable", "well known", "famous", "noted"},
+		{"very", "mildly", "most", "reasonably", ""},
+		{"ancient", "\x95", "great", "vast", "pink"},
+		{"\x9E \x9D plantations", "mountains", "\x9C", "\x94 forests", "oceans"},
+		{"shyness", "silliness", "mating traditions", "loathing of \x86", "love for \x86"},
+		{"food blenders", "tourists", "poetry", "discos", "\x8E"},
+		{"talking tree", "crab", "bat", "lobst", "\xB2"},
+		{"beset", "plagued", "ravaged", "cursed", "scourged"},
+		{"\x96 civil war", "\x9B \x98 \x99s", "a \x9B disease", "\x96 earthquakes", "\x96 solar activity"},
+		{"its \x83 \x84", "the \xB1 \x98 \x99", "its inhabitants' \x9A \x85", "\xA1", "its \x8D \x8E"},
+		{"juice", "brandy", "water", "brew", "gargle blasters"},
+		{"\xB2", "\xB1 \x99", "\xB1 \xB2", "\xB1 \x9B", "\x9B \xB2"},
+		{"fabulous", "exotic", "hoopy", "unusual", "exciting"},
+		{"cuisine", "night life", "casinos", "sit coms", " \xA1 "},
+		{"\xB0", "The planet \xB0", "The world \xB0", "This planet", "This world"},
+		{"n unremarkable", " boring", " dull", " tedious", " revolting"},
+		{"planet", "world", "place", "little planet", "dump"},
+		{"wasp", "moth", "grub", "ant", "\xB2"},
+		{"poet", "arts graduate", "yak", "snail", "slug"},
+		{"tropical", "dense", "rain", "impenetrable", "exuberant"},
+		{"funny", "wierd", "unusual", "strange", "peculiar"},
+		{"frequent", "occasional", "unpredictable", "dreadful", "deadly"},
+		{"\x82 \x81 for \x8A", "\x82 \x81 for \x8A and \x8A", "\x88 by \x89", "\x82 \x81 for \x8A but \x88 by \x89", "a\x90 \x91"},
+		{"\x9B", "mountain", "edible", "tree", "spotted"},
+		{"\x9F", "\xA0", "\x87oid", "\x93", "\x92"},
+		{"ancient", "exceptional", "eccentric", "ingrained", "\x95"},
+		{"killer", "deadly", "evil", "lethal", "vicious"},
+		{"parking meters", "dust clouds", "ice bergs", "rock formations", "volcanoes"},
+		{"plant", "tulip", "banana", "corn", "\xB2weed"},
+		{"\xB2", "\xB1 \xB2", "\xB1 \x9B", "inhabitant", "\xB1 \xB2"},
+		{"shrew", "beast", "bison", "snake", "wolf"},
+		{"leopard", "cat", "monkey", "goat", "fish"},
+		{"\x8C \x8B", "\xB1 \x9F \xA2", "its \x8D \xA0 \xA2", "\xA3 \xA4", "\x8C \x8B"},
+		{"meat", "cutlet", "steak", "burgers", "soup"},
+		{"ice", "mud", "Zero-G", "vacuum", "\xB1 ultra"},
+		{"hockey", "cricket", "karate", "polo", "tennis"},
+	}
+
+	for {
+		if len(source) == 0 {
+			break
+		}
+
+		c := source[0:1]
+		source = source[1:]
+
+		cr := []byte(c)[0]
+
+		if cr < 0x80 {
+			gs = gs + c
+		} else {
+			if cr <= 0xA4 {
+				rnd := g.prng.gen_rnd_number()
+
+				a := 0
+				b := 0
+				c := 0
+				d := 0
+
+				if rnd >= 0x33 {
+					a = 1
+				}
+
+				if rnd >= 0x66 {
+					b = 1
+				}
+
+				if rnd >= 0x99 {
+					c = 1
+				}
+
+				if rnd >= 0xCC {
+					d = 1
+				}
+
+				gs = g.sgoatSoup(gs, desc[int(cr-0x81)][a+b+c+d], psy)
+
+			} else {
+
+				switch cr {
+				case 0xB0: /* planet name */
+
+					gs = gs + psy.Name[0:1]
+					for _, char := range psy.Name[1:] {
+						gs = gs + strings.ToLower(string(char))
+					}
+
+				case 0xB1: /* <planet name>ian */
+					i := 1
+					gs = gs + psy.Name[0:1]
+
+					for _, char := range psy.Name[1:] {
+						if (i+1 < len(psy.Name)) || ((char != 'E') && (char != 'I')) {
+							gs = gs + strings.ToLower(string(char))
+						}
+					}
+
+					gs = gs + "ian"
+
+				case 0xB2: /* random name */
+					length := g.prng.gen_rnd_number() & 3
+
+					for i := 0; uint16(i) <= length; i++ {
+						x := g.prng.gen_rnd_number() & 0x3e
+						if i == 0 {
+							gs = gs + fmt.Sprintf("%c", g.dataTables.pairs0[x])
+						} else {
+							gs = gs + strings.ToLower(string(g.dataTables.pairs0[x]))
+						}
+
+						gs = gs + strings.ToLower(string(g.dataTables.pairs0[x+1]))
+					}
+
+				default:
+					gs = fmt.Sprintf("<bad char in data [%X]>", c)
+					return gs
+				}
+			}
+		}
+	}
+
+	return gs
+}
+
 func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
 
 	if compressed {
@@ -438,4 +565,37 @@ func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
 		fmt.Println()
 
 	}
+}
+
+func (g *Galaxy) SprintSystem(plsy planetarySystem, compressed bool) string {
+
+	systemData := ""
+
+	g.prng.rnd_seed = plsy.goatsoupseed
+	gs := g.sgoatSoup("", "\x8F is \x97.", &plsy)
+
+	if compressed {
+		systemData = fmt.Sprintf("%10s\t", plsy.Name)
+		systemData = systemData + fmt.Sprintf(" TL: %2d ", (plsy.Techlev)+1)
+		systemData = systemData + fmt.Sprintf("%12s", g.dataTables.econnames[plsy.Economy])
+		systemData = systemData + fmt.Sprintf(" %15s", g.dataTables.govnames[plsy.Govtype])
+	} else {
+		systemData = systemData + fmt.Sprintf("\n\nSystem: %s", plsy.Name)
+		systemData = systemData + fmt.Sprintf("\nPosition (%d,", plsy.X)
+		systemData = systemData + fmt.Sprintf("%d)", plsy.Y)
+		systemData = systemData + fmt.Sprintf("\nEconomy: (%d) ", plsy.Economy)
+		systemData = systemData + fmt.Sprintf(g.dataTables.econnames[plsy.Economy])
+		systemData = systemData + fmt.Sprintf("\nGovernment: (%d) ", plsy.Govtype)
+		systemData = systemData + fmt.Sprintf(g.dataTables.govnames[plsy.Govtype])
+		systemData = systemData + fmt.Sprintf("\nTech Level: %2d", (plsy.Techlev)+1)
+		systemData = systemData + fmt.Sprintf("\nTurnover: %d", (plsy.Productivity))
+		systemData = systemData + fmt.Sprintf("\nRadius: %d", plsy.Radius)
+		systemData = systemData + fmt.Sprintf("\nPopulation: %d Billion", (plsy.Population)>>3)
+
+		systemData = systemData + "\n" + gs + "\n"
+		systemData = systemData + "\n"
+
+	}
+
+	return systemData
 }
