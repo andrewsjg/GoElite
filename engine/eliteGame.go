@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
@@ -36,13 +39,55 @@ type Game struct {
 	useNativeRand bool
 	AlienItems    uint16
 	Commodities   []TradeGood
+	GameCommands  []GameCommand
 }
+
+type GameCommand map[string]func(game *Game, args ...[]string) string
 
 type NavInfo struct {
 	System                   planetarySystem
 	ReachableWithMaxFuel     bool
 	ReachableWithCurrentFuel bool
 	Distance                 int
+}
+
+// Builds a map of game commands.
+// Each command is a function type that can be called to execute the command
+func buildGameCommands(game *Game) []GameCommand {
+	cmds := []GameCommand{}
+	gc := GameCommand{}
+
+	infoCmd := func(game *Game, args ...[]string) string {
+		return game.SprintState()
+	}
+	gc["info"] = infoCmd
+
+	jumpCmd := func(game *Game, args ...[]string) string {
+		// Because this is variadic, the args are an array of string arrays. This is a bit wierd. Might be a way around this?
+		jumpResult := "Unknown Destination"
+
+		//fmt.Println(args)
+		if len(args[0]) >= 2 {
+
+			dest := args[0][1]
+			err := game.Jump(dest)
+
+			if err != nil {
+				jumpResult = err.Error()
+			} else {
+				jumpResult = "Jump Complete\n"
+			}
+		}
+
+		output := jumpResult + "\n" + game.SprintState()
+		return output
+	}
+
+	gc["jump"] = jumpCmd
+
+	cmds = append(cmds, gc)
+
+	return cmds
 }
 
 func (g *Game) gameRand() uint {
@@ -93,13 +138,15 @@ func InitGame(useNativeRand bool) Game {
 	game.lastrand = 0
 	game.useNativeRand = useNativeRand
 
+	game.GameCommands = buildGameCommands(&game)
+
 	return game
 }
 
 // Game functions
 
 func (g *Game) Jump(planetName string) error {
-	dest := g.Galaxy.Matchsys(planetName)
+	dest := g.Galaxy.Matchsys(strings.ToUpper(planetName))
 
 	if dest == g.Player.Ship.Location.CurrentPlanet {
 		return errors.New("bad jump")
@@ -206,18 +253,20 @@ func (g *Game) PrintState() {
 // Return game state as a string
 func (g *Game) SprintState() string {
 
+	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+
 	gameState := ""
 
 	gal := g.Galaxy
 	shipLocation := g.Player.Ship.Location
 	planet := gal.Systems[shipLocation.CurrentPlanet]
 
-	gameState = fmt.Sprintf("Current System is: %s", planet.Name)
-	gameState = gameState + g.Galaxy.SprintSystem(planet, false) + "\n"
-	gameState = gameState + planet.SprintMarket(g.Commodities) + "\n"
-	gameState = gameState + fmt.Sprintf("Cash: \t\t%.1f\n", float64(g.Player.Cash)/float64(10))
-	gameState = gameState + fmt.Sprintf("Fuel: \t\t%.1f\n", float64(g.Player.Ship.Fuel)/float64(10))
-	gameState = gameState + fmt.Sprintf("Hold Space: \t%dt\n\n", g.Player.Ship.Holdspace)
+	//gameState = fmt.Sprintf("Current System is: %s", planet.Name)
+	gameState = gameState + g.Galaxy.SprintSystem(planet, false) //+ "\n"
+	//gameState = gameState + planet.SprintMarket(g.Commodities) + "\n"
+	gameState = gameState + fmt.Sprintf("\n%s\t\t%.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))
+	gameState = gameState + fmt.Sprintf("%s \t\t%.1f\n", style.Render("Fuel:"), float64(g.Player.Ship.Fuel)/float64(10))
+	gameState = gameState + fmt.Sprintf("%s \t%dt", style.Render("Hold Space:"), g.Player.Ship.Holdspace)
 
 	return gameState
 

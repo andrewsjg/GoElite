@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	eliteEngine "github.com/andrewsjg/GoElite/engine"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -54,7 +55,6 @@ func StartTView() {
 type CommandModel struct {
 	viewport viewport.Model
 	cmdInput textinput.Model
-	done     bool
 	game     eliteEngine.Game
 	gameCmd  string
 }
@@ -80,16 +80,21 @@ func (m CommandModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case tea.KeyEnter:
-			style := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+			//style := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
 			m.gameCmd = m.cmdInput.Value()
+
+			if strings.ToUpper(m.gameCmd) == "EXIT" {
+				return m, tea.Quit
+			}
+
 			output, err := m.executeCommand()
 
 			if err != nil {
 				output = "There was an error with the command: " + err.Error()
 			}
 
-			m.viewport.SetContent(style.Render(output))
+			m.viewport.SetContent(output)
 			m.cmdInput.Reset()
 			m.cmdInput.Blink()
 			m.viewport.GotoBottom()
@@ -100,9 +105,10 @@ func (m CommandModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m CommandModel) View() string {
+	style := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
 	return fmt.Sprintf(
-		"--== Elite v1.5 ==--\n%s\n\nCommand %s",
+		style.Render("--== Elite v1.5 ==--")+"\n\n%s\n\nCommand %s",
 		m.viewport.View(),
 		m.cmdInput.View(),
 	) + "\n\n"
@@ -111,9 +117,20 @@ func (m CommandModel) View() string {
 var _ tea.Model = &CommandModel{}
 
 // Execute a game command
-func (m *CommandModel) executeCommand() (string, error) {
+// Looks up the game command in the map of commands, if it finds a match it calls the
+// function stored in the map value
 
-	cmdOutput := "Command: " + m.gameCmd + " was requested"
+func (m *CommandModel) executeCommand() (string, error) {
+	cmdOutput := "Command not found"
+	cmdParts := strings.Fields(m.gameCmd)
+
+	for _, cmd := range m.game.GameCommands {
+
+		if cmd[cmdParts[0]] != nil {
+
+			cmdOutput = cmd[cmdParts[0]](&m.game, cmdParts)
+		}
+	}
 
 	return cmdOutput, nil
 }
@@ -125,8 +142,9 @@ func NewCommand(game eliteEngine.Game) *CommandModel {
 	//cmdPrompt.Placeholder = "info"
 	cmdPrompt.Focus()
 
-	vp := viewport.New(30, 5)
+	vp := viewport.New(100, 15)
 
+	vp.SetContent(game.SprintState())
 	return &CommandModel{
 		game:     game,
 		cmdInput: cmdPrompt,

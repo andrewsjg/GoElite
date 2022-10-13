@@ -8,6 +8,8 @@ import (
 	"math"
 	"math/rand"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 // four byte random number used for planet description
@@ -570,30 +572,31 @@ func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
 func (g *Galaxy) SprintSystem(plsy planetarySystem, compressed bool) string {
 
 	systemData := ""
+	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
 	g.prng.rnd_seed = plsy.goatsoupseed
 	gs := g.sgoatSoup("", "\x8F is \x97.", &plsy)
 
 	if compressed {
 		systemData = fmt.Sprintf("%10s\t", plsy.Name)
-		systemData = systemData + fmt.Sprintf(" TL: %2d ", (plsy.Techlev)+1)
+		systemData = systemData + fmt.Sprintf(" %s %2d ", style.Render(" TL:"), (plsy.Techlev)+1)
 		systemData = systemData + fmt.Sprintf("%12s", g.dataTables.econnames[plsy.Economy])
 		systemData = systemData + fmt.Sprintf(" %15s", g.dataTables.govnames[plsy.Govtype])
 	} else {
-		systemData = systemData + fmt.Sprintf("\n\nSystem: %s", plsy.Name)
-		systemData = systemData + fmt.Sprintf("\nPosition (%d,", plsy.X)
-		systemData = systemData + fmt.Sprintf("%d)", plsy.Y)
-		systemData = systemData + fmt.Sprintf("\nEconomy: (%d) ", plsy.Economy)
-		systemData = systemData + fmt.Sprintf(g.dataTables.econnames[plsy.Economy])
-		systemData = systemData + fmt.Sprintf("\nGovernment: (%d) ", plsy.Govtype)
-		systemData = systemData + fmt.Sprintf(g.dataTables.govnames[plsy.Govtype])
-		systemData = systemData + fmt.Sprintf("\nTech Level: %2d", (plsy.Techlev)+1)
-		systemData = systemData + fmt.Sprintf("\nTurnover: %d", (plsy.Productivity))
-		systemData = systemData + fmt.Sprintf("\nRadius: %d", plsy.Radius)
-		systemData = systemData + fmt.Sprintf("\nPopulation: %d Billion", (plsy.Population)>>3)
+		systemData = systemData + fmt.Sprintf("%s %s\n", style.Render("System:"), plsy.Name)
+		systemData = systemData + fmt.Sprintf("%s (%d,", style.Render("Position:"), plsy.X)
+		systemData = systemData + fmt.Sprintf("%d)\n", plsy.Y)
+		systemData = systemData + fmt.Sprintf("%s (%d) ", style.Render("Economy:"), plsy.Economy)
+		systemData = systemData + fmt.Sprintf("%s\n", g.dataTables.econnames[plsy.Economy])
+		systemData = systemData + fmt.Sprintf("%s (%d) ", style.Render("Government"), plsy.Govtype)
+		systemData = systemData + fmt.Sprintf("%s\n", g.dataTables.govnames[plsy.Govtype])
+		systemData = systemData + fmt.Sprintf("%s %2d\n", style.Render("Tech Level:"), (plsy.Techlev)+1)
+		systemData = systemData + fmt.Sprintf("%s %d\n", style.Render("Turnover:"), (plsy.Productivity))
+		systemData = systemData + fmt.Sprintf("%s %d\n", style.Render("Radius:"), plsy.Radius)
+		systemData = systemData + fmt.Sprintf("%s %d Billion\n", style.Render("Population:"), (plsy.Population)>>3)
 
-		systemData = systemData + "\n" + gs + "\n"
-		systemData = systemData + "\n"
+		systemData = systemData + gs + "\n"
+		//systemData = systemData + "\n"
 
 	}
 
