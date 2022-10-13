@@ -82,7 +82,6 @@ func buildGameCommands(game *Game) []GameCommand {
 		output := jumpResult + "\n" + game.SprintState()
 		return output
 	}
-
 	gc["jump"] = jumpCmd
 
 	cmds = append(cmds, gc)
@@ -264,9 +263,10 @@ func (g *Game) SprintState() string {
 	//gameState = fmt.Sprintf("Current System is: %s", planet.Name)
 	gameState = gameState + g.Galaxy.SprintSystem(planet, false) //+ "\n"
 	//gameState = gameState + planet.SprintMarket(g.Commodities) + "\n"
-	gameState = gameState + fmt.Sprintf("\n%s\t\t%.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))
-	gameState = gameState + fmt.Sprintf("%s \t\t%.1f\n", style.Render("Fuel:"), float64(g.Player.Ship.Fuel)/float64(10))
-	gameState = gameState + fmt.Sprintf("%s \t%dt", style.Render("Hold Space:"), g.Player.Ship.Holdspace)
+
+	gameState = gameState + fmt.Sprintf("\n%s %.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))
+	gameState = gameState + fmt.Sprintf("%s %.1f\n", style.Render("Fuel:"), float64(g.Player.Ship.Fuel)/float64(10))
+	gameState = gameState + fmt.Sprintf("%s %dt", style.Render("Hold Space:"), g.Player.Ship.Holdspace)
 
 	return gameState
 

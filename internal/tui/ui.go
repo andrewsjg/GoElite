@@ -88,13 +88,17 @@ func (m CommandModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 
-			output, err := m.executeCommand()
+			if len(m.gameCmd) > 0 {
 
-			if err != nil {
-				output = "There was an error with the command: " + err.Error()
+				output, err := m.executeCommand()
+
+				if err != nil {
+					output = "There was an error with the command: " + err.Error()
+				}
+
+				m.viewport.SetContent(output)
 			}
 
-			m.viewport.SetContent(output)
 			m.cmdInput.Reset()
 			m.cmdInput.Blink()
 			m.viewport.GotoBottom()
@@ -107,9 +111,13 @@ func (m CommandModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m CommandModel) View() string {
 	style := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
+	border := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("63"))
+
 	return fmt.Sprintf(
 		style.Render("--== Elite v1.5 ==--")+"\n\n%s\n\nCommand %s",
-		m.viewport.View(),
+		border.Render(m.viewport.View()),
 		m.cmdInput.View(),
 	) + "\n\n"
 }
@@ -119,7 +127,6 @@ var _ tea.Model = &CommandModel{}
 // Execute a game command
 // Looks up the game command in the map of commands, if it finds a match it calls the
 // function stored in the map value
-
 func (m *CommandModel) executeCommand() (string, error) {
 	cmdOutput := "Command not found"
 	cmdParts := strings.Fields(m.gameCmd)
@@ -128,7 +135,11 @@ func (m *CommandModel) executeCommand() (string, error) {
 
 		if cmd[cmdParts[0]] != nil {
 
-			cmdOutput = cmd[cmdParts[0]](&m.game, cmdParts)
+			// Pull the command function out of the commands map
+			cmdFunc := cmd[cmdParts[0]]
+
+			// Call the command function
+			cmdOutput = cmdFunc(&m.game, cmdParts)
 		}
 	}
 
