@@ -17,7 +17,7 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 - Better TUI
 - Game saves
 
-## Aspiratonal
+## Aspirational
 
 - 2D game engine
 - Combat
