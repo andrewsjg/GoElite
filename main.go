@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	engine "github.com/andrewsjg/GoElite/engine"
+	"github.com/andrewsjg/GoElite/internal/tui"
 )
 
 // Currently this does nothing except initialise the game as per the defaults
@@ -13,8 +14,10 @@ import (
 
 func main() {
 
-	game := engine.InitGame(false)
-	debugTests(game)
+	//game := engine.InitGame(false)
+	//debugTests(game)
+
+	tui.Start()
 
 }
 
