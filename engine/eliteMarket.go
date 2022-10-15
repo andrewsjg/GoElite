@@ -11,6 +11,7 @@ import (
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
+
 // Market functions
 
 type TradeGood struct { /* In 6502 version these were: */

@@ -10,7 +10,8 @@ import (
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
-// Core game function
+
+// Core game functions and objects
 
 type player struct {
 	Ship ship
@@ -30,8 +31,7 @@ type ship struct {
 }
 
 type Game struct {
-	Galaxy Galaxy
-	//PlayerShip    ship
+	Galaxy        Galaxy
 	Player        player
 	maxFuel       uint16
 	fuelCost      uint16
@@ -42,6 +42,7 @@ type Game struct {
 	GameCommands  []GameCommand
 }
 
+// A gamecommand is a map of commands to the functions that execute the command
 type GameCommand map[string]func(game *Game, args ...[]string) string
 
 type NavInfo struct {
@@ -63,7 +64,9 @@ func buildGameCommands(game *Game) []GameCommand {
 	gc["info"] = infoCmd
 
 	jumpCmd := func(game *Game, args ...[]string) string {
-		// Because this is variadic, the args are an array of string arrays. This is a bit wierd. Might be a way around this?
+		// Because this is variadic and how I am passing the arguments as a split string,
+		// the args are an array of string arrays. This makes this code a bit wierd. Might be a way around this?
+
 		jumpResult := "Unknown Destination"
 
 		//fmt.Println(args)
@@ -232,7 +235,7 @@ func (g *Game) GetSystemData(systemName string) planetarySystem {
 	return g.Galaxy.Systems[g.Galaxy.Matchsys(systemName)]
 }
 
-// Print out the current state of the game. Mostly for debug
+// Print out the current state of the game. Mostly for debug or simple CLI
 func (g *Game) PrintState() {
 	gal := g.Galaxy
 	shipLocation := g.Player.Ship.Location
@@ -261,7 +264,7 @@ func (g *Game) SprintState() string {
 	planet := gal.Systems[shipLocation.CurrentPlanet]
 
 	//gameState = fmt.Sprintf("Current System is: %s", planet.Name)
-	gameState = gameState + g.Galaxy.SprintSystem(planet, false) //+ "\n"
+	gameState = gameState + g.Galaxy.SprintSystem(planet, false)
 	//gameState = gameState + planet.SprintMarket(g.Commodities) + "\n"
 
 	gameState = gameState + fmt.Sprintf("\n%s %.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))

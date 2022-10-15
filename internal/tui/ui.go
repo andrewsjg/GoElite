@@ -10,47 +10,9 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/rivo/tview"
 )
 
-// tview UI experiments
-func CreateUI() {
-	app := tview.NewApplication()
-	flex := tview.NewFlex().
-		AddItem(tview.NewBox().SetBorder(true).SetTitle("Left (1/2 x width of Top)"), 0, 1, false).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle("Top"), 0, 1, false).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle("Middle (3 x height of Top)"), 0, 3, false).
-			AddItem(tview.NewBox().SetBorder(true).SetTitle("Bottom (5 rows)"), 5, 1, false), 0, 2, false).
-		AddItem(tview.NewBox().SetBorder(true).SetTitle("Right (20 cols)"), 20, 1, false)
-	if err := app.SetRoot(flex, true).SetFocus(flex).Run(); err != nil {
-		panic(err)
-	}
-
-}
-
-func StartTView() {
-	game := eliteEngine.InitGame(false)
-
-	app := tview.NewApplication()
-
-	commands := []string{"Jump", "Buy Fuel", "Hyperspace Jump", "Buy Commodity", "Sell Commodity", "Show Hold"}
-	commandPanel := tview.NewList().ShowSecondaryText(false)
-	commandPanel.SetBorder(true).SetTitle("Commands")
-
-	flex := tview.NewFlex().
-		AddItem(commandPanel, 0, 1, false)
-
-	for _, command := range commands {
-		commandPanel.AddItem(command, "", 0, func() { game.Jump("DISO") })
-	}
-
-	if err := app.SetRoot(flex, true).SetFocus(commandPanel).Run(); err != nil {
-		panic(err)
-	}
-}
-
-// Bubble Tea UI experiements
+// Bubble Tea UI
 
 type CommandModel struct {
 	viewport viewport.Model
@@ -149,8 +111,6 @@ func (m *CommandModel) executeCommand() (string, error) {
 func NewCommand(game eliteEngine.Game) *CommandModel {
 
 	cmdPrompt := textinput.New()
-
-	//cmdPrompt.Placeholder = "info"
 	cmdPrompt.Focus()
 
 	vp := viewport.New(100, 15)

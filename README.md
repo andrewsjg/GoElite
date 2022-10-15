@@ -7,12 +7,24 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 ## Done
 
 - Game engine complete
+- Info Command
+- Jump Command
 
-## In Progress
+## Main component in Progress
 
 - TUI
 
-## Todo
+## Todo - Now
+
+- Market Command
+- Local Command
+- Buy Command
+- Sell Command
+- Fuel Command
+- Hyperspace command
+- Help Command
+
+## Todo - Sometime
 
 - Better TUI
 - Game saves
