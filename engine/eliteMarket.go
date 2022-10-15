@@ -1,13 +1,14 @@
 package eliteEngine
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
@@ -265,28 +266,24 @@ func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 }
 
 func (p *planetarySystem) SprintMarket(commodities []TradeGood) string {
+	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
 	marketData := ""
-	buf := bytes.NewBufferString(marketData)
-
 	numCommodities := len(commodities) - 1
 	mkt := p.Market
-	w := tabwriter.NewWriter(buf, 0, 4, 5, ' ', 0)
 
-	fmt.Fprintln(w, "Local Market")
-	fmt.Fprintf(w, "Commodity\tPrice\tQuantity\n")
-	fmt.Fprintln(w, "------------------------------------")
+	marketData = fmt.Sprintf("%s\n\n", headerStyle.Render("Local Market"))
+	marketData = marketData + fmt.Sprintf("%-*sPrice  Quantity\n", 21, "Commodity")
+	marketData = marketData + fmt.Sprintln("------------------------------------")
 	for i := 0; i <= numCommodities; i++ {
-
-		fmt.Fprintf(w, commodities[i].Name)
-		fmt.Fprintf(w, "\t%.1f", float64(mkt.Price[i])/float64(10))
-		fmt.Fprintf(w, "\t%d", mkt.Quantity[i])
-		fmt.Fprintf(w, mkt.UnitNames[commodities[1].Units])
-		fmt.Fprintln(w, "")
+		marketData = marketData + fmt.Sprintf("%-*s", 21, commodities[i].Name)
+		marketData = marketData + fmt.Sprintf(" %-*.1f", 5, float64(mkt.Price[i])/float64(10))
+		marketData = marketData + fmt.Sprintf(" %d", mkt.Quantity[i])
+		marketData = marketData + fmt.Sprintf(mkt.UnitNames[commodities[1].Units])
+		marketData = marketData + fmt.Sprintln("")
 
 	}
-	fmt.Fprintln(buf, "------------------------------------")
-	w.Flush()
+	//marketData = marketData + fmt.Sprintln("------------------------------------")
 
 	return marketData
 }

@@ -24,9 +24,13 @@ func main() {
 func debugTests(game engine.Game) {
 
 	// Initial State
-	game.PrintState()
+	//game.PrintState()
 
-	// Jump to DISO
+	plan := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet]
+
+	fmt.Println(plan.SprintMarket(game.Commodities))
+
+	/* Jump to DISO
 	err := game.Jump("DISO")
 
 	if err != nil {
@@ -40,5 +44,6 @@ func debugTests(game engine.Game) {
 	fmt.Printf("\nDoing Hyperspace Jump\n\n")
 	game.HyperSpaceJump()
 
-	game.PrintLocal()
+	game.PrintLocal() */
+
 }

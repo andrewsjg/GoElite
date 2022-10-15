@@ -23,7 +23,9 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 - Fuel Command
 - Hyperspace command
 - Help Command
+- TUI Status bar
 - Tidy up basic TUI
+- Fix bug that means market isnt generated on hyperspace jump
 
 ## Todo - Sometime
 

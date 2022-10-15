@@ -39,11 +39,13 @@ type Game struct {
 	useNativeRand bool
 	AlienItems    uint16
 	Commodities   []TradeGood
-	GameCommands  []GameCommand
+	GameCommands  GameCommands
 }
 
 // A gamecommand is a map of commands to the functions that execute the command
-type GameCommand map[string]func(game *Game, args ...[]string) string
+// TODO: Shoult func return a generic type here? For now returning strings works because all
+// the result of a command is is some status output that goes on screen
+type GameCommands map[string]func(game *Game, args ...[]string) (stauts string, output string)
 
 type NavInfo struct {
 	System                   planetarySystem
@@ -54,16 +56,20 @@ type NavInfo struct {
 
 // Builds a map of game commands.
 // Each command is a function type that can be called to execute the command
-func buildGameCommands(game *Game) []GameCommand {
-	cmds := []GameCommand{}
-	gc := GameCommand{}
+func buildGameCommands(game *Game) GameCommands {
 
-	infoCmd := func(game *Game, args ...[]string) string {
-		return game.SprintState()
+	gc := GameCommands{}
+
+	// Info Command
+
+	infoCmd := func(game *Game, args ...[]string) (status string, output string) {
+		return "OK", game.SprintState()
 	}
 	gc["info"] = infoCmd
 
-	jumpCmd := func(game *Game, args ...[]string) string {
+	// Jump Command
+
+	jumpCmd := func(game *Game, args ...[]string) (status string, output string) {
 		// Because this is variadic and how I am passing the arguments as a split string,
 		// the args are an array of string arrays. This makes this code a bit wierd. Might be a way around this?
 
@@ -82,14 +88,59 @@ func buildGameCommands(game *Game) []GameCommand {
 			}
 		}
 
-		output := jumpResult + "\n" + game.SprintState()
-		return output
+		status = jumpResult
+		output = game.SprintState()
+
+		return status, output
 	}
 	gc["jump"] = jumpCmd
 
-	cmds = append(cmds, gc)
+	mktCmd := func(game *Game, args ...[]string) (status string, output string) {
 
-	return cmds
+		system := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet]
+		output = system.SprintMarket(game.Commodities)
+		status = "OK"
+
+		return status, output
+	}
+
+	gc["mkt"] = mktCmd
+
+	buyCmd := func(game *Game, args ...[]string) (status string, output string) {
+
+		return status, output
+	}
+
+	gc["buy"] = buyCmd
+
+	sellCmd := func(game *Game, args ...[]string) (status string, output string) {
+
+		return status, output
+	}
+
+	gc["sell"] = sellCmd
+
+	hyperCmd := func(game *Game, args ...[]string) (status string, output string) {
+
+		return status, output
+	}
+
+	gc["hyper"] = hyperCmd
+
+	localCmd := func(game *Game, args ...[]string) (status string, output string) {
+
+		return status, output
+	}
+
+	gc["local"] = localCmd
+
+	helpCmd := func(game *Game, args ...[]string) (status string, output string) {
+
+		return status, output
+	}
+
+	gc["help"] = helpCmd
+	return gc
 }
 
 func (g *Game) gameRand() uint {
@@ -255,6 +306,7 @@ func (g *Game) PrintState() {
 // Return game state as a string
 func (g *Game) SprintState() string {
 
+	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
 	gameState := ""
@@ -263,7 +315,7 @@ func (g *Game) SprintState() string {
 	shipLocation := g.Player.Ship.Location
 	planet := gal.Systems[shipLocation.CurrentPlanet]
 
-	//gameState = fmt.Sprintf("Current System is: %s", planet.Name)
+	gameState = fmt.Sprintf("%s\n\n", headerStyle.Render("System Info"))
 	gameState = gameState + g.Galaxy.SprintSystem(planet, false)
 	//gameState = gameState + planet.SprintMarket(g.Commodities) + "\n"
 

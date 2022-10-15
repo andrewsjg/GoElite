@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -10,15 +9,19 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/knipferrc/teacup/statusbar"
 )
 
 // Bubble Tea UI
 
+// TODO: Rename the model. This doesnt make sense any more
 type CommandModel struct {
-	viewport viewport.Model
-	cmdInput textinput.Model
-	game     eliteEngine.Game
-	gameCmd  string
+	systemViewport viewport.Model
+	marketViewport viewport.Model
+	cmdInput       textinput.Model
+	statusBar      statusbar.Bubble
+	game           eliteEngine.Game
+	gameCmd        string
 }
 
 func (m CommandModel) Init() tea.Cmd {
@@ -28,12 +31,14 @@ func (m CommandModel) Init() tea.Cmd {
 func (m CommandModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var (
-		tiCmd tea.Cmd
-		vpCmd tea.Cmd
+		tiCmd    tea.Cmd
+		sysVpCmd tea.Cmd
+		mktVpCmd tea.Cmd
 	)
 
 	m.cmdInput, tiCmd = m.cmdInput.Update(msg)
-	m.viewport, vpCmd = m.viewport.Update(msg)
+	m.systemViewport, sysVpCmd = m.systemViewport.Update(msg)
+	m.marketViewport, mktVpCmd = m.marketViewport.Update(msg)
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -50,38 +55,31 @@ func (m CommandModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 
+			if strings.ToUpper(m.gameCmd) == "Q" {
+				return m, tea.Quit
+			}
+
 			if len(m.gameCmd) > 0 {
 
-				output, err := m.executeCommand()
+				status, output, err := m.executeCommand()
 
 				if err != nil {
 					output = "There was an error with the command: " + err.Error()
 				}
 
-				m.viewport.SetContent(output)
+				// Placeholder until the status bar is implemented
+				output = status + "\n\n" + output
+				m.systemViewport.SetContent(output)
+
 			}
 
 			m.cmdInput.Reset()
 			m.cmdInput.Blink()
-			m.viewport.GotoBottom()
+			m.systemViewport.GotoBottom()
 		}
 	}
 
-	return m, tea.Batch(tiCmd, vpCmd)
-}
-
-func (m CommandModel) View() string {
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
-
-	border := lipgloss.NewStyle().
-		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63"))
-
-	return fmt.Sprintf(
-		style.Render("--== Elite v1.5 ==--")+"\n\n%s\n\nCommand %s",
-		border.Render(m.viewport.View()),
-		m.cmdInput.View(),
-	) + "\n\n"
+	return m, tea.Batch(tiCmd, sysVpCmd, mktVpCmd)
 }
 
 var _ tea.Model = &CommandModel{}
@@ -89,23 +87,21 @@ var _ tea.Model = &CommandModel{}
 // Execute a game command
 // Looks up the game command in the map of commands, if it finds a match it calls the
 // function stored in the map value
-func (m *CommandModel) executeCommand() (string, error) {
+func (m *CommandModel) executeCommand() (status string, output string, err error) {
 	cmdOutput := "Command not found"
 	cmdParts := strings.Fields(m.gameCmd)
+	cmds := m.game.GameCommands
 
-	for _, cmd := range m.game.GameCommands {
+	if cmds[cmdParts[0]] != nil {
 
-		if cmd[cmdParts[0]] != nil {
+		// Pull the command function out of the commands map
+		cmdFunc := cmds[cmdParts[0]]
 
-			// Pull the command function out of the commands map
-			cmdFunc := cmd[cmdParts[0]]
-
-			// Call the command function
-			cmdOutput = cmdFunc(&m.game, cmdParts)
-		}
+		// Call the command function
+		status, cmdOutput = cmdFunc(&m.game, cmdParts)
 	}
 
-	return cmdOutput, nil
+	return status, cmdOutput, nil
 }
 
 func NewCommand(game eliteEngine.Game) *CommandModel {
@@ -113,13 +109,41 @@ func NewCommand(game eliteEngine.Game) *CommandModel {
 	cmdPrompt := textinput.New()
 	cmdPrompt.Focus()
 
-	vp := viewport.New(100, 15)
+	//TODO: Fix these sizes
+	sysvp := viewport.New(100, 25)
+	mktvp := viewport.New(100, 25)
 
-	vp.SetContent(game.SprintState())
+	sysvp.SetContent(game.SprintState())
+	mktvp.SetContent(game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].SprintMarket(game.Commodities))
+
+	sb := statusbar.New(
+		statusbar.ColorConfig{
+			Foreground: lipgloss.AdaptiveColor{Dark: "#ffffff", Light: "#ffffff"},
+			Background: lipgloss.AdaptiveColor{Light: "#F25D94", Dark: "#F25D94"},
+		},
+		statusbar.ColorConfig{
+			Foreground: lipgloss.AdaptiveColor{Light: "#ffffff", Dark: "#ffffff"},
+			Background: lipgloss.AdaptiveColor{Light: "#3c3836", Dark: "#3c3836"},
+		},
+		statusbar.ColorConfig{
+			Foreground: lipgloss.AdaptiveColor{Light: "#ffffff", Dark: "#ffffff"},
+			Background: lipgloss.AdaptiveColor{Light: "#A550DF", Dark: "#A550DF"},
+		},
+		statusbar.ColorConfig{
+			Foreground: lipgloss.AdaptiveColor{Light: "#ffffff", Dark: "#ffffff"},
+			Background: lipgloss.AdaptiveColor{Light: "#6124DF", Dark: "#6124DF"},
+		},
+	)
+	sb.SetContent("test.txt", "~/.config/nvim", "1/23", "SB")
+	//TODO: Fix these sizes
+	sb.SetSize(112)
+
 	return &CommandModel{
-		game:     game,
-		cmdInput: cmdPrompt,
-		viewport: vp,
+		game:           game,
+		cmdInput:       cmdPrompt,
+		systemViewport: sysvp,
+		marketViewport: mktvp,
+		statusBar:      sb,
 	}
 }
 
