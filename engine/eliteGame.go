@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -63,7 +64,7 @@ func buildGameCommands(game *Game) GameCommands {
 	// Info Command
 
 	infoCmd := func(game *Game, args ...[]string) (status string, output string) {
-		return "OK", game.SprintState()
+		return "", game.SprintState()
 	}
 	gc["info"] = infoCmd
 
@@ -84,7 +85,7 @@ func buildGameCommands(game *Game) GameCommands {
 			if err != nil {
 				jumpResult = err.Error()
 			} else {
-				jumpResult = "Jump Complete\n"
+				jumpResult = "Jump Complete"
 			}
 		}
 
@@ -107,6 +108,25 @@ func buildGameCommands(game *Game) GameCommands {
 	gc["mkt"] = mktCmd
 
 	buyCmd := func(game *Game, args ...[]string) (status string, output string) {
+
+		if len(args[0]) >= 3 {
+			commodity := args[0][1]
+			amount, err := strconv.Atoi(args[0][2])
+
+			if err != nil {
+				amount = 0
+				return "Buy Failed", output
+			}
+
+			bought, err := game.BuyCommodity(commodity, amount)
+
+			if err != nil {
+				status = "Buy Failed. " + err.Error()
+				return status, output
+			}
+
+			status = "Bought " + fmt.Sprint(bought) + " tonne of " + commodity
+		}
 
 		return status, output
 	}

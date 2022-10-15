@@ -7,11 +7,6 @@ import (
 	"github.com/andrewsjg/GoElite/internal/tui"
 )
 
-// Currently this does nothing except initialise the game as per the defaults
-// and run some simply commands for debug
-
-// TODO:  Add CLI and TUI to make game playable
-
 func main() {
 
 	//game := engine.InitGame(false)

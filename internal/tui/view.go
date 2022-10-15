@@ -12,11 +12,11 @@ func (m Tui) View() string {
 	//TODO: Look at how to make these more dynamic
 	sysBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63")).Width(80)
+		BorderForeground(lipgloss.Color("63")).Width(80).Height(35)
 
 	mktBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63")).Width(60)
+		BorderForeground(lipgloss.Color("63")).Width(60).Height(35)
 
 	cmdBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
