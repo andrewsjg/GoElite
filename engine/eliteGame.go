@@ -177,7 +177,7 @@ func InitGame(useNativeRand bool) Game {
 	// Start in Galaxy 1 at Lave
 	// Not sure I need this bit?
 	ship.Location.CurrentGalaxy = game.Galaxy.galaxyNum
-	ship.Location.CurrentPlanet = game.Galaxy.CurrentPlanet
+	ship.Location.CurrentPlanet = 7 //game.Galaxy.CurrentPlanet
 
 	player.Ship = ship
 	player.Cash = 1000
@@ -199,7 +199,7 @@ func InitGame(useNativeRand bool) Game {
 // Game functions
 
 func (g *Game) Jump(planetName string) error {
-	dest := g.Galaxy.Matchsys(strings.ToUpper(planetName))
+	dest := g.Matchsys(strings.ToUpper(planetName))
 
 	if dest == g.Player.Ship.Location.CurrentPlanet {
 		return errors.New("bad jump")
@@ -283,7 +283,7 @@ func (g *Game) ReachableSystems() []NavInfo {
 
 // Function that returns a planetary system record. Can be used for print system info
 func (g *Game) GetSystemData(systemName string) planetarySystem {
-	return g.Galaxy.Systems[g.Galaxy.Matchsys(systemName)]
+	return g.Galaxy.Systems[g.Matchsys(systemName)]
 }
 
 // Print out the current state of the game. Mostly for debug or simple CLI

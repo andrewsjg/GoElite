@@ -42,10 +42,9 @@ type planetarySystem struct {
 }
 
 type Galaxy struct {
-	galaxyNum     int
-	CurrentPlanet int
-	Size          int
-	Systems       []planetarySystem
+	galaxyNum int
+	Size      int
+	Systems   []planetarySystem
 
 	prng       *galPRNG
 	dataTables planetDataTables
@@ -96,8 +95,7 @@ func initGalaxy(galaxyNumber int) Galaxy {
 	galRNG.mysrand(12345)
 
 	// Galaxy parameters
-	galaxy.Size = 256        // Should pass this as a parameter?
-	galaxy.CurrentPlanet = 7 // Start at Lave. Should pass this as a parameter?
+	galaxy.Size = 256 // Should pass this as a parameter?
 	galaxy.galaxyNum = galaxyNumber
 	galaxy.prng = &galRNG
 	galaxy.Systems = make([]planetarySystem, galaxy.Size)
@@ -260,7 +258,7 @@ func (g *Galaxy) makeSystem(s *seed) planetarySystem {
 }
 
 /* Return id of the planet whose name matches passed strinmg
-   closest to currentplanet - if none return currentplanet */
+   closest to currentplanet - if none return currentplanet
 
 func (g *Galaxy) Matchsys(platnetName string) int {
 
@@ -273,6 +271,27 @@ func (g *Galaxy) Matchsys(platnetName string) int {
 			if distance(g.Systems[syscount], g.Systems[g.CurrentPlanet]) < d {
 
 				d = distance(g.Systems[syscount], g.Systems[g.CurrentPlanet])
+				p = syscount
+			}
+		}
+	}
+
+	return p
+}  */
+
+func (g *Game) Matchsys(platnetName string) int {
+
+	p := g.Player.Ship.Location.CurrentPlanet
+	currentPlanet := p
+	gal := g.Galaxy
+	d := 9999
+
+	for syscount := 0; syscount < gal.Size; syscount++ {
+
+		if strings.HasPrefix(gal.Systems[syscount].Name, platnetName) {
+			if distance(gal.Systems[syscount], gal.Systems[currentPlanet]) < d {
+
+				d = distance(gal.Systems[syscount], gal.Systems[currentPlanet])
 				p = syscount
 			}
 		}
@@ -538,6 +557,11 @@ func (g *Galaxy) sgoatSoup(gs string, source string, psy *planetarySystem) strin
 	}
 
 	return gs
+}
+
+// Convienince function to return the name of the planet that the player is at
+func (g *Game) PlayerCurrentPlanetName() string {
+	return g.Galaxy.Systems[g.Player.Ship.Location.CurrentPlanet].Name
 }
 
 func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
