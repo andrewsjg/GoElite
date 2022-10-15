@@ -23,6 +23,7 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 - Fuel Command
 - Hyperspace command
 - Help Command
+- Tidy up basic TUI
 
 ## Todo - Sometime
 
