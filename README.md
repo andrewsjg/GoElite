@@ -16,14 +16,14 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 
 ## Todo - Now
 
-- Market Command
+- --Market Command--
 - Local Command
-- Buy Command
-- Sell Command
-- Fuel Command
+- --Buy Command--
+- --Sell Command--
+- --Fuel Command--
 - Hyperspace command
 - Help Command
-- TUI Status bar
+- --TUI Status bar--
 - Tidy up basic TUI
 - Fix bug that means market isnt generated on hyperspace jump
 
