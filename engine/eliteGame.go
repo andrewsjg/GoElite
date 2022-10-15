@@ -110,12 +110,24 @@ func buildGameCommands(game *Game) GameCommands {
 	buyCmd := func(game *Game, args ...[]string) (status string, output string) {
 
 		if len(args[0]) >= 3 {
+
 			commodity := args[0][1]
 			amount, err := strconv.Atoi(args[0][2])
 
 			if err != nil {
 				amount = 0
 				return "Buy Failed", output
+			}
+
+			if strings.ToUpper(commodity) == "FUEL" {
+				err = game.BuyFuel(int16(amount))
+
+				if err != nil {
+					status = "Buy fuel failed. " + err.Error()
+					return status, output
+				}
+
+				return "Bought Fuel", output
 			}
 
 			bought, err := game.BuyCommodity(commodity, amount)
@@ -134,6 +146,26 @@ func buildGameCommands(game *Game) GameCommands {
 	gc["buy"] = buyCmd
 
 	sellCmd := func(game *Game, args ...[]string) (status string, output string) {
+
+		if len(args[0]) >= 3 {
+			commodity := args[0][1]
+
+			amount, err := strconv.Atoi(args[0][2])
+
+			if err != nil {
+				amount = 0
+				return "Sell Failed", output
+			}
+
+			bought, err := game.SellCommodity(commodity, amount)
+
+			if err != nil {
+				status = "Sell Failed. " + err.Error()
+				return status, output
+			}
+
+			status = "Sold " + fmt.Sprint(bought) + " tonne of " + commodity
+		}
 
 		return status, output
 	}

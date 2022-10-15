@@ -235,7 +235,7 @@ func (g *Game) BuyFuel(amount int16) error {
 	}
 
 	// Add amount of fuel to the ship
-	g.Player.Ship.Fuel = g.Player.Ship.Fuel + uint16(amount)
+	g.Player.Ship.Fuel = g.Player.Ship.Fuel + (uint16(amount) * 10)
 
 	// Deduct cost from player cash
 	g.Player.Cash = g.Player.Cash - (int16(g.fuelCost) * amount)

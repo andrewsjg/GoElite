@@ -82,7 +82,7 @@ func (m *Tui) executeCommand() (status string, output string, err error) {
 	cmds := m.game.GameCommands
 
 	// Need to filter the commands that are valid in the tui
-	tuiCmds := "jump,buy,local,info"
+	tuiCmds := "jump,buy,sell,local,info"
 
 	if cmds[cmdParts[0]] != nil {
 
