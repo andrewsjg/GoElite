@@ -34,6 +34,8 @@ func SprintState(g eliteEngine.Game) string {
 
 func SprintMarket(g eliteEngine.Game) string {
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+	fieldNameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	colNameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
 
 	marketData := ""
 	numCommodities := len(g.Commodities) - 1
@@ -42,12 +44,13 @@ func SprintMarket(g eliteEngine.Game) string {
 	mkt := p.Market
 
 	marketData = fmt.Sprintf("%s\n\n", headerStyle.Render("Local Market"))
-	marketData = marketData + fmt.Sprintf("%-*sPrice  Quantity\n", 21, "Commodity")
-	marketData = marketData + fmt.Sprintln("------------------------------------")
+	//marketData = marketData + fmt.Sprintf("%-*sPrice  Quantity\n", 30, colNameStyle.Render("Commodity"))
+	marketData = marketData + fmt.Sprintf("%-*s %s  %s\n", 30, colNameStyle.Render("Commodity"), colNameStyle.Render("Price"), colNameStyle.Render("Quantity"))
+	//marketData = marketData + fmt.Sprintln("------------------------------------")
 	for i := 0; i <= numCommodities; i++ {
-		marketData = marketData + fmt.Sprintf("%-*s", 21, g.Commodities[i].Name)
+		marketData = marketData + fmt.Sprintf("%-*s", 30, fieldNameStyle.Render(g.Commodities[i].Name))
 		marketData = marketData + fmt.Sprintf(" %-*.1f", 5, float64(mkt.Price[i])/float64(10))
-		marketData = marketData + fmt.Sprintf(" %d", mkt.Quantity[i])
+		marketData = marketData + fmt.Sprintf("  %d", mkt.Quantity[i])
 		marketData = marketData + fmt.Sprintf(mkt.UnitNames[g.Commodities[1].Units])
 		marketData = marketData + fmt.Sprintln("")
 
@@ -64,7 +67,7 @@ func SprintSystem(game eliteEngine.Game, systemName string, compressed bool) str
 	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
 	if compressed {
-		systemData = fmt.Sprintf("%10s\t", sd.Name)
+		systemData = fmt.Sprintf("%10s", sd.Name)
 		systemData = systemData + fmt.Sprintf(" %s %2d ", style.Render(" TL:"), sd.Techlev)
 		systemData = systemData + fmt.Sprintf("%12s", sd.EconomyName)
 		systemData = systemData + fmt.Sprintf(" %15s", sd.GovName)
@@ -86,4 +89,25 @@ func SprintSystem(game eliteEngine.Game, systemName string, compressed bool) str
 	}
 
 	return systemData
+}
+
+func SprintLocal(game eliteEngine.Game) string {
+	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+
+	localSystems := headerStyle.Render("Local Systems\n\n")
+
+	reachable := game.ReachableSystems()
+
+	for _, navinfo := range reachable {
+		if navinfo.ReachableWithCurrentFuel {
+			localSystems = localSystems + "\n *"
+		} else {
+			localSystems = localSystems + "\n -"
+		}
+
+		localSystems = localSystems + SprintSystem(game, navinfo.System.Name, true)
+		localSystems = localSystems + fmt.Sprintf(" (%.1f LY)", float64(navinfo.Distance)/float64(10))
+	}
+
+	return localSystems
 }

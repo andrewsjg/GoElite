@@ -88,7 +88,6 @@ func buildGameCommands(game *Game) GameCommands {
 		}
 
 		status = jumpResult
-		//output = game.SprintState()
 
 		return status, output
 	}
@@ -191,6 +190,25 @@ func buildGameCommands(game *Game) GameCommands {
 
 	gc["help"] = helpCmd
 	return gc
+}
+
+// Execute a game command
+// Looks up the game command in the map of commands, if it finds a match it calls the
+// function stored in the map value
+func (g *Game) ExecuteCommand(cmd string) (status string, output string) {
+	cmdOutput := ""
+	status = "Command not found"
+	cmdParts := strings.Fields(cmd)
+
+	if g.GameCommands[cmdParts[0]] != nil {
+
+		// Pull the command function out of the commands map
+		cmdFunc := g.GameCommands[cmdParts[0]]
+		// Call the command function
+		status, cmdOutput = cmdFunc(g, cmdParts)
+	}
+
+	return status, cmdOutput
 }
 
 func (g *Game) gameRand() uint {
@@ -330,6 +348,7 @@ func (g *Game) GetPlanetaryData(systemName string) PlanetarySystem {
 	gal.prng.rnd_seed = psys.goatsoupseed
 	gs := gal.sgoatSoup("", "\x8F is \x97.", &psys)
 
+	systemData.Name = psys.Name
 	systemData.Description = gs
 	systemData.Techlev = psys.Techlev + 1
 	systemData.Economy = psys.Economy

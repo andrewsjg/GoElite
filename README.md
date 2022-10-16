@@ -21,10 +21,11 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 - ~~Fuel Command~~
 - ~~Jump Command~~
 - ~~Info Command~~
-- Local Command
+- ~~Local Command~~
 - Hyperspace command
 - Help Command
 - ~~TUI Status bar~~
+- Add ship info panel
 - Tidy up basic TUI
 - Fix bug that means market isnt generated on hyperspace jump
 

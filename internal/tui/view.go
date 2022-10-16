@@ -9,7 +9,7 @@ import (
 func (m Tui) View() string {
 	style := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
-	//TODO: Look at how to make these more dynamic
+	//TODO: Look at how to make these more dynamic and cater for light/dark terminals
 	sysBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("63")).Width(80).Height(35)
