@@ -39,25 +39,36 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 
+			// TODO: Revisit - Not sure any of this is any good. Basically a command should execute, return output
+			// and status. Then the TUI should simply print the current game state. Feels like this could be simplified.
+
 			if len(m.gameCmd) > 0 {
 
-				status, output, err := m.executeCommand()
+				var err error
+				// TODO: Think of something to add for Info
+				status := "INFO: OK"
+				output := ""
 
-				if err != nil {
-					status = "There was an error with the command: " + err.Error()
-					output = ""
+				if strings.ToUpper(m.gameCmd) == "INFO" {
+					output = SprintState(m.game)
+
+				} else {
+					status, output, err = m.executeCommand()
+
+					if err != nil {
+						status = "There was an error with the command: " + err.Error()
+						output = ""
+					}
 				}
 
 				if output != "" {
 					m.systemViewport.SetContent(output)
 				} else {
-					m.systemViewport.SetContent(m.game.SprintState())
+					m.systemViewport.SetContent(SprintState(m.game))
 				}
 
-				m.marketViewport.SetContent(m.game.Galaxy.Systems[m.game.Player.Ship.Location.CurrentPlanet].SprintMarket(m.game.Commodities))
-
-				// TODO: Think of something to add for Info
-				m.statusBar.SetContent(m.game.PlayerCurrentPlanetName(), "  "+cases.Title(language.English).String(status), "", "INFO: OK")
+				m.marketViewport.SetContent(SprintMarket(m.game))
+				m.statusBar.SetContent(m.game.PlayerCurrentPlanetName(), "  "+cases.Title(language.English).String(status), "", status)
 			}
 
 			m.cmdInput.Reset()

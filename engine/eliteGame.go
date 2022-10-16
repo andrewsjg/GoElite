@@ -6,8 +6,6 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
@@ -90,7 +88,7 @@ func buildGameCommands(game *Game) GameCommands {
 		}
 
 		status = jumpResult
-		output = game.SprintState()
+		//output = game.SprintState()
 
 		return status, output
 	}
@@ -284,25 +282,6 @@ func (g *Game) HyperSpaceJump() {
 	g.Galaxy.buildGalaxy(g.Galaxy.galaxyNum)
 }
 
-// Show local systems. Replicates the orginal functionality.
-func (g *Game) PrintLocal() {
-	fmt.Printf("Galaxy Number: %d", g.Galaxy.galaxyNum)
-
-	reachable := g.ReachableSystems()
-
-	for _, navinfo := range reachable {
-		if navinfo.ReachableWithCurrentFuel {
-			fmt.Printf("\n *")
-		} else {
-			fmt.Printf("\n - ")
-		}
-		g.Galaxy.PrintSystem(navinfo.System, true)
-		fmt.Printf(" (%.1f LY)", float64(navinfo.Distance)/float64(10))
-	}
-
-	fmt.Println()
-}
-
 // Return and array of reachable systems
 func (g *Game) ReachableSystems() []NavInfo {
 	reachable := []NavInfo{}
@@ -338,6 +317,34 @@ func (g *Game) GetSystemData(systemName string) planetarySystem {
 	return g.Galaxy.Systems[g.Matchsys(systemName)]
 }
 
+// Game Display Functions
+
+func (g *Game) GetPlanetaryData(systemName string) PlanetarySystem {
+
+	systemData := PlanetarySystem{}
+
+	gal := g.Galaxy
+	dataTables := gal.dataTables
+	psys := gal.Systems[g.Matchsys(systemName)]
+
+	gal.prng.rnd_seed = psys.goatsoupseed
+	gs := gal.sgoatSoup("", "\x8F is \x97.", &psys)
+
+	systemData.Description = gs
+	systemData.Techlev = psys.Techlev + 1
+	systemData.Economy = psys.Economy
+	systemData.EconomyName = dataTables.econnames[psys.Economy]
+	systemData.Govtype = psys.Govtype
+	systemData.GovName = dataTables.govnames[psys.Govtype]
+	systemData.Productivity = psys.Productivity
+	systemData.Population = psys.Population >> 3
+	systemData.Radius = psys.Radius
+	systemData.X = psys.X
+	systemData.Y = psys.Y
+
+	return systemData
+}
+
 // Print out the current state of the game. Mostly for debug or simple CLI
 func (g *Game) PrintState() {
 	gal := g.Galaxy
@@ -358,23 +365,39 @@ func (g *Game) PrintState() {
 // Return game state as a string
 func (g *Game) SprintState() string {
 
-	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
-
 	gameState := ""
 
 	gal := g.Galaxy
 	shipLocation := g.Player.Ship.Location
 	planet := gal.Systems[shipLocation.CurrentPlanet]
 
-	gameState = fmt.Sprintf("%s\n\n", headerStyle.Render("System Info"))
+	gameState = fmt.Sprintf("%s\n\n", "System Info")
 	gameState = gameState + g.Galaxy.SprintSystem(planet, false)
 	//gameState = gameState + planet.SprintMarket(g.Commodities) + "\n"
 
-	gameState = gameState + fmt.Sprintf("\n%s %.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))
-	gameState = gameState + fmt.Sprintf("%s %.1f\n", style.Render("Fuel:"), float64(g.Player.Ship.Fuel)/float64(10))
-	gameState = gameState + fmt.Sprintf("%s %dt", style.Render("Hold Space:"), g.Player.Ship.Holdspace)
+	gameState = gameState + fmt.Sprintf("\n%s %.1f\n", "Cash:", float64(g.Player.Cash)/float64(10))
+	gameState = gameState + fmt.Sprintf("%s %.1f\n", "Fuel:", float64(g.Player.Ship.Fuel)/float64(10))
+	gameState = gameState + fmt.Sprintf("%s %dt", "Hold Space:", g.Player.Ship.Holdspace)
 
 	return gameState
 
+}
+
+// Show local systems. Replicates the orginal functionality.
+func (g *Game) PrintLocal() {
+	fmt.Printf("Galaxy Number: %d", g.Galaxy.galaxyNum)
+
+	reachable := g.ReachableSystems()
+
+	for _, navinfo := range reachable {
+		if navinfo.ReachableWithCurrentFuel {
+			fmt.Printf("\n *")
+		} else {
+			fmt.Printf("\n - ")
+		}
+		g.Galaxy.PrintSystem(navinfo.System, true)
+		fmt.Printf(" (%.1f LY)", float64(navinfo.Distance)/float64(10))
+	}
+
+	fmt.Println()
 }

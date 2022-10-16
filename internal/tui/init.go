@@ -23,8 +23,8 @@ func New(game eliteEngine.Game) *Tui {
 	cmdPrompt.Focus()
 
 	//TODO: Fix these sizes
-	sysvp := viewport.New(100, 30)
-	mktvp := viewport.New(100, 30)
+	sysvp := viewport.New(100, 25)
+	mktvp := viewport.New(100, 25)
 
 	sysvp.SetContent(game.SprintState())
 	mktvp.SetContent(game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].SprintMarket(game.Commodities))

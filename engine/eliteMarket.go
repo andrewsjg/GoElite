@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
@@ -24,6 +22,10 @@ type TradeGood struct { /* In 6502 version these were: */
 	Name      string /* longest="Radioactives" */
 }
 
+// TODO: Revisit this. Storing the unit names as part of the market struct
+// is a departure from the effiecent storage method
+// used by the rest of the game and it doesnt really make
+// sense to do it like this here.
 type Market struct {
 	Price     []uint16
 	Quantity  []uint16
@@ -243,6 +245,8 @@ func (g *Game) BuyFuel(amount int16) error {
 	return nil
 }
 
+// Market Display Functions
+
 func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 	numCommodities := len(commodities) - 1
 	mkt := p.Market
@@ -265,14 +269,14 @@ func (p *planetarySystem) PrintMarket(commodities []TradeGood) {
 
 }
 
+// Returns market data as a string rather than printing to the screen
 func (p *planetarySystem) SprintMarket(commodities []TradeGood) string {
-	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
 	marketData := ""
 	numCommodities := len(commodities) - 1
 	mkt := p.Market
 
-	marketData = fmt.Sprintf("%s\n\n", headerStyle.Render("Local Market"))
+	marketData = fmt.Sprintf("%s\n\n", "Local Market")
 	marketData = marketData + fmt.Sprintf("%-*sPrice  Quantity\n", 21, "Commodity")
 	marketData = marketData + fmt.Sprintln("------------------------------------")
 	for i := 0; i <= numCommodities; i++ {

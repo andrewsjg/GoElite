@@ -8,8 +8,6 @@ import (
 	"math"
 	"math/rand"
 	"strings"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
 // four byte random number used for planet description
@@ -27,6 +25,12 @@ type seed struct {
 	w2 uint16
 }
 
+// Internal representation of a planetary system.
+// Mostly true to the original version using
+// the most efficient data structure to store all the
+// data. Apart from the name of the system all string data
+// is generated only when screen output is required.
+// One concsession is the market field.
 type planetarySystem struct {
 	X            uint16
 	Y            uint16 /* One byte unsigned */
@@ -39,6 +43,29 @@ type planetarySystem struct {
 	goatsoupseed fastseed
 	Name         string
 	Market       Market
+}
+
+// External representation of a planetary system. This includes string fields.
+// Used when passing planetary data outside the engine. Not stored anywhere.
+// This may seem redundant and has a bad smell (and I think it is and does),
+// but I, wanted to keep true to the original as much as possible in the core
+// code.
+// May change this later. I could simply pre-generate everything and hold
+// it all in memory while the game is running.
+
+type PlanetarySystem struct {
+	X            uint16
+	Y            uint16 /* One byte unsigned */
+	Economy      uint16 /* These two are actually only 0-7  */
+	EconomyName  string
+	Govtype      uint16
+	GovName      string
+	Techlev      uint16 /* 0-16 i think */
+	Population   uint16 /* One byte */
+	Productivity uint16 /* Two byte */
+	Radius       uint16 /* Two byte (not used by game at all) */
+	Description  string
+	Name         string
 }
 
 type Galaxy struct {
@@ -279,6 +306,7 @@ func (g *Galaxy) Matchsys(platnetName string) int {
 	return p
 }  */
 
+// TODO: Dont like the way this works. Revisit
 func (g *Game) Matchsys(platnetName string) int {
 
 	p := g.Player.Ship.Location.CurrentPlanet
@@ -432,6 +460,7 @@ func (g *Galaxy) goatSoup(source string, psy *planetarySystem) {
 	}
 }
 
+// func (g *Galaxy) sgoatSoup(gs string, source string, psy *planetarySystem) string {
 func (g *Galaxy) sgoatSoup(gs string, source string, psy *planetarySystem) string {
 
 	desc := [][]string{
@@ -593,34 +622,35 @@ func (g *Galaxy) PrintSystem(plsy planetarySystem, compressed bool) {
 	}
 }
 
+// Galaxy Display Functions
+
+// Returns a formatted string of System Data
 func (g *Galaxy) SprintSystem(plsy planetarySystem, compressed bool) string {
 
 	systemData := ""
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
 	g.prng.rnd_seed = plsy.goatsoupseed
 	gs := g.sgoatSoup("", "\x8F is \x97.", &plsy)
 
 	if compressed {
 		systemData = fmt.Sprintf("%10s\t", plsy.Name)
-		systemData = systemData + fmt.Sprintf(" %s %2d ", style.Render(" TL:"), (plsy.Techlev)+1)
+		systemData = systemData + fmt.Sprintf(" %s %2d ", " TL:", (plsy.Techlev)+1)
 		systemData = systemData + fmt.Sprintf("%12s", g.dataTables.econnames[plsy.Economy])
 		systemData = systemData + fmt.Sprintf(" %15s", g.dataTables.govnames[plsy.Govtype])
 	} else {
-		systemData = systemData + fmt.Sprintf("%s %s\n", style.Render("System:"), plsy.Name)
-		systemData = systemData + fmt.Sprintf("%s (%d,", style.Render("Position:"), plsy.X)
+		systemData = systemData + fmt.Sprintf("%s %s\n", "System:", plsy.Name)
+		systemData = systemData + fmt.Sprintf("%s (%d,", "Position:", plsy.X)
 		systemData = systemData + fmt.Sprintf("%d)\n", plsy.Y)
-		systemData = systemData + fmt.Sprintf("%s (%d) ", style.Render("Economy:"), plsy.Economy)
+		systemData = systemData + fmt.Sprintf("%s (%d) ", "Economy:", plsy.Economy)
 		systemData = systemData + fmt.Sprintf("%s\n", g.dataTables.econnames[plsy.Economy])
-		systemData = systemData + fmt.Sprintf("%s (%d) ", style.Render("Government"), plsy.Govtype)
+		systemData = systemData + fmt.Sprintf("%s (%d) ", "Government", plsy.Govtype)
 		systemData = systemData + fmt.Sprintf("%s\n", g.dataTables.govnames[plsy.Govtype])
-		systemData = systemData + fmt.Sprintf("%s %2d\n", style.Render("Tech Level:"), (plsy.Techlev)+1)
-		systemData = systemData + fmt.Sprintf("%s %d\n", style.Render("Turnover:"), (plsy.Productivity))
-		systemData = systemData + fmt.Sprintf("%s %d\n", style.Render("Radius:"), plsy.Radius)
-		systemData = systemData + fmt.Sprintf("%s %d Billion\n", style.Render("Population:"), (plsy.Population)>>3)
+		systemData = systemData + fmt.Sprintf("%s %2d\n", "Tech Level:", (plsy.Techlev)+1)
+		systemData = systemData + fmt.Sprintf("%s %d\n", "Turnover:", (plsy.Productivity))
+		systemData = systemData + fmt.Sprintf("%s %d\n", "Radius:", plsy.Radius)
+		systemData = systemData + fmt.Sprintf("%s %d Billion\n", "Population:", (plsy.Population)>>3)
 
 		systemData = systemData + gs + "\n"
-		//systemData = systemData + "\n"
 
 	}
 
