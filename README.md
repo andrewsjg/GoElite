@@ -4,11 +4,9 @@ A Go version of TxtElite.
 
 Based off of: http://www.iancgbell.clara.net/elite/text/
 
-## Done
+## Complete
 
-- Game engine complete
-- Info Command
-- Jump Command
+- Game engine 
 
 ## Main component in Progress
 
@@ -21,6 +19,9 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 - ~~Buy Command~~
 - ~~Sell Command~~
 - ~~Fuel Command~~
+- ~~Jump Command~~
+- ~~Info Command~~
+- Local Command
 - Hyperspace command
 - Help Command
 - ~~TUI Status bar~~
