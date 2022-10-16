@@ -1,6 +1,6 @@
 # Go Elite
 
-A Go version of TxtElite.
+A Go version of TxtElite. Which implements a terminal UI for playing the trading game. 
 
 Based off of: http://www.iancgbell.clara.net/elite/text/
 
@@ -32,6 +32,8 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 
 - Better TUI
 - Game saves
+- Score
+- "Improved" economy
 
 ## Aspirational
 
