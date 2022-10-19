@@ -356,7 +356,7 @@ func (g *Game) GetPlanetaryData(systemName string) PlanetarySystem {
 	systemData.Govtype = psys.Govtype
 	systemData.GovName = dataTables.govnames[psys.Govtype]
 	systemData.Productivity = psys.Productivity
-	systemData.Population = psys.Population >> 3
+	systemData.Population = psys.Population
 	systemData.Radius = psys.Radius
 	systemData.X = psys.X
 	systemData.Y = psys.Y

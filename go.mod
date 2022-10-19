@@ -7,10 +7,12 @@ require (
 	github.com/charmbracelet/bubbletea v0.22.1
 	github.com/charmbracelet/lipgloss v0.5.0
 	github.com/knipferrc/teacup v0.3.0
+	golang.org/x/text v0.3.8
 )
 
 require (
 	github.com/atotto/clipboard v0.1.4 // indirect
+	github.com/charmbracelet/harmonica v0.2.0 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
@@ -23,5 +25,4 @@ require (
 	github.com/rivo/uniseg v0.4.2 // indirect
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 // indirect
-	golang.org/x/text v0.3.8 // indirect
 )

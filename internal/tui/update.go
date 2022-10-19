@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"strconv"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -25,6 +26,7 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
+
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 
@@ -67,9 +69,13 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				m.marketViewport.SetContent(SprintMarket(&m.game))
+				m.shipViewport.SetContent(SprintShipData(&m.game))
 
 				// TODO: Think of something to add for Info
-				m.statusBar.SetContent(m.game.PlayerCurrentPlanetName(), "  "+cases.Title(language.English).String(status), "", "INFO: OK")
+
+				system := m.game.GetPlanetaryData(m.game.PlayerCurrentPlanetName())
+				pos := "(" + strconv.Itoa(int(system.X)) + "," + strconv.Itoa(int(system.Y)) + ")"
+				m.statusBar.SetContent(m.game.PlayerCurrentPlanetName(), "  "+cases.Title(language.English).String(status), "", pos)
 			}
 
 			m.cmdInput.Reset()
