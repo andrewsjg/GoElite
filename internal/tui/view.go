@@ -18,6 +18,10 @@ func (m Tui) View() string {
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("63")).Width(60).Height(35)
 
+	shipBorder := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("63")).Width(142).Height(5)
+
 	cmdBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("63")).
@@ -25,12 +29,13 @@ func (m Tui) View() string {
 
 	leftViewPort := sysBorder.Render(m.systemViewport.View())
 	rightViewPort := mktBorder.Render(m.marketViewport.View())
+	bottomViewPort := shipBorder.Render(m.shipViewport.View())
 	statusBar := m.statusBar.View()
 
 	commandInput := cmdBorder.Render(fmt.Sprintf("Command %s\n\n", m.cmdInput.View()))
 
 	viewPorts := lipgloss.JoinHorizontal(lipgloss.Top, leftViewPort, rightViewPort)
-	composedView := lipgloss.JoinVertical(lipgloss.Top, viewPorts, commandInput, statusBar)
+	composedView := lipgloss.JoinVertical(lipgloss.Top, viewPorts, bottomViewPort, commandInput, statusBar)
 
 	return fmt.Sprintf(
 		style.Render("--== Elite v1.5 ==--")+"\n\n%s",

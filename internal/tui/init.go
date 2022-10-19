@@ -25,9 +25,11 @@ func New(game eliteEngine.Game) *Tui {
 	//TODO: Fix these sizes
 	sysvp := viewport.New(100, 25)
 	mktvp := viewport.New(100, 25)
+	shpvp := viewport.New(140, 5)
 
-	sysvp.SetContent(SprintState(game))
-	mktvp.SetContent(SprintMarket(game))
+	sysvp.SetContent(SprintState(&game))
+	mktvp.SetContent(SprintMarket(&game))
+	shpvp.SetContent(SprintShipData(&game))
 
 	sb := statusbar.New(
 		statusbar.ColorConfig{
@@ -57,6 +59,7 @@ func New(game eliteEngine.Game) *Tui {
 		cmdInput:       cmdPrompt,
 		systemViewport: sysvp,
 		marketViewport: mktvp,
+		shipViewport:   shpvp,
 		statusBar:      sb,
 	}
 }

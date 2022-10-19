@@ -11,14 +11,16 @@ import (
 func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var (
-		tiCmd    tea.Cmd
-		sysVpCmd tea.Cmd
-		mktVpCmd tea.Cmd
+		tiCmd     tea.Cmd
+		sysVpCmd  tea.Cmd
+		mktVpCmd  tea.Cmd
+		shipVpCmd tea.Cmd
 	)
 
 	m.cmdInput, tiCmd = m.cmdInput.Update(msg)
 	m.systemViewport, sysVpCmd = m.systemViewport.Update(msg)
 	m.marketViewport, mktVpCmd = m.marketViewport.Update(msg)
+	m.shipViewport, shipVpCmd = m.shipViewport.Update(msg)
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -48,10 +50,10 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				output := ""
 
 				if strings.ToUpper(m.gameCmd) == "INFO" {
-					output = SprintState(m.game)
+					output = SprintState(&m.game)
 
 				} else if strings.ToUpper(m.gameCmd) == "LOCAL" {
-					output = SprintLocal(m.game)
+					output = SprintLocal(&m.game)
 
 				} else {
 					status, output = m.executeTUICommand(m.gameCmd)
@@ -61,10 +63,11 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if output != "" {
 					m.systemViewport.SetContent(output)
 				} else {
-					m.systemViewport.SetContent(SprintState(m.game))
+					m.systemViewport.SetContent(SprintState(&m.game))
 				}
 
-				m.marketViewport.SetContent(SprintMarket(m.game))
+				m.marketViewport.SetContent(SprintMarket(&m.game))
+
 				// TODO: Think of something to add for Info
 				m.statusBar.SetContent(m.game.PlayerCurrentPlanetName(), "  "+cases.Title(language.English).String(status), "", "INFO: OK")
 			}
@@ -74,9 +77,10 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.systemViewport.GotoBottom()
 
 		}
+
 	}
 
-	return m, tea.Batch(tiCmd, sysVpCmd, mktVpCmd)
+	return m, tea.Batch(tiCmd, sysVpCmd, mktVpCmd, shipVpCmd)
 }
 
 var _ tea.Model = &Tui{}
@@ -94,6 +98,8 @@ func (m *Tui) executeTUICommand(cmd string) (status string, output string) {
 			// Call the command function
 			status, output = m.game.ExecuteCommand(cmd)
 
+		} else {
+			status = "Unknown Command"
 		}
 	}
 	return status, output

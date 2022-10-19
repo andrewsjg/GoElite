@@ -10,7 +10,7 @@ import (
 // Functions for displaying formatted game information
 
 // Return game state as a string
-func SprintState(g eliteEngine.Game) string {
+func SprintState(g *eliteEngine.Game) string {
 
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
@@ -32,7 +32,7 @@ func SprintState(g eliteEngine.Game) string {
 
 }
 
-func SprintMarket(g eliteEngine.Game) string {
+func SprintMarket(g *eliteEngine.Game) string {
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 	fieldNameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 	colNameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
@@ -60,7 +60,7 @@ func SprintMarket(g eliteEngine.Game) string {
 	return marketData
 }
 
-func SprintSystem(game eliteEngine.Game, systemName string, compressed bool) string {
+func SprintSystem(game *eliteEngine.Game, systemName string, compressed bool) string {
 
 	systemData := ""
 	sd := game.GetPlanetaryData(systemName)
@@ -91,7 +91,7 @@ func SprintSystem(game eliteEngine.Game, systemName string, compressed bool) str
 	return systemData
 }
 
-func SprintLocal(game eliteEngine.Game) string {
+func SprintLocal(game *eliteEngine.Game) string {
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
 	localSystems := headerStyle.Render("Local Systems\n\n")
@@ -110,4 +110,14 @@ func SprintLocal(game eliteEngine.Game) string {
 	}
 
 	return localSystems
+}
+
+func SprintShipData(game *eliteEngine.Game) string {
+	shipData := "Ship Info\n"
+	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+
+	shipData = headerStyle.Render(shipData)
+
+	return shipData
+
 }

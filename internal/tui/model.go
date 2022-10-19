@@ -11,6 +11,7 @@ import (
 type Tui struct {
 	systemViewport viewport.Model
 	marketViewport viewport.Model
+	shipViewport   viewport.Model
 	cmdInput       textinput.Model
 	statusBar      statusbar.Bubble
 	game           eliteEngine.Game
