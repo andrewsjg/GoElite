@@ -71,8 +71,6 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.marketViewport.SetContent(SprintMarket(&m.game))
 				m.shipViewport.SetContent(SprintShipData(&m.game))
 
-				// TODO: Think of something to add for Info
-
 				system := m.game.GetPlanetaryData(m.game.PlayerCurrentPlanetName())
 				pos := "(" + strconv.Itoa(int(system.X)) + "," + strconv.Itoa(int(system.Y)) + ")"
 				m.statusBar.SetContent(m.game.PlayerCurrentPlanetName(), "  "+cases.Title(language.English).String(status), "", pos)

@@ -8,7 +8,6 @@ import (
 	"github.com/knipferrc/teacup/statusbar"
 )
 
-// TODO: Rename the model. This doesnt make sense any more
 type Tui struct {
 	systemViewport viewport.Model
 	marketViewport viewport.Model
