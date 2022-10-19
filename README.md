@@ -1,12 +1,12 @@
 # Go Elite
 
-A Go version of TxtElite. Which implements a terminal UI for playing the trading game. 
+A Go version of TxtElite. Which implements a terminal UI for playing the trading game.
 
-Based off of: http://www.iancgbell.clara.net/elite/text/
+Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 
 ## Complete
 
-- Game engine 
+- Game engine
 
 ## Main component in Progress
 
