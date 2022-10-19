@@ -13,7 +13,7 @@ import (
 func SprintState(g *eliteEngine.Game) string {
 
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
-	style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	//style := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
 	gameState := ""
 
@@ -24,9 +24,9 @@ func SprintState(g *eliteEngine.Game) string {
 	gameState = fmt.Sprintf("%s\n\n", headerStyle.Render("System Info"))
 	gameState = gameState + SprintSystem(g, planet, false)
 
-	gameState = gameState + fmt.Sprintf("\n%s %.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))
+	/*gameState = gameState + fmt.Sprintf("\n%s %.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))
 	gameState = gameState + fmt.Sprintf("%s %.1f\n", style.Render("Fuel:"), float64(g.Player.Ship.Fuel)/float64(10))
-	gameState = gameState + fmt.Sprintf("%s %dt", style.Render("Hold Space:"), g.Player.Ship.Holdspace)
+	gameState = gameState + fmt.Sprintf("%s %dt", style.Render("Hold Space:"), g.Player.Ship.Holdspace) */
 
 	return gameState
 
@@ -55,6 +55,7 @@ func SprintMarket(g *eliteEngine.Game) string {
 		marketData = marketData + fmt.Sprintln("")
 
 	}
+
 	//marketData = marketData + fmt.Sprintln("------------------------------------")
 
 	return marketData
@@ -115,8 +116,12 @@ func SprintLocal(game *eliteEngine.Game) string {
 func SprintShipData(game *eliteEngine.Game) string {
 	shipData := "Ship Info\n"
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+	nameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
-	shipData = headerStyle.Render(shipData)
+	holdSpace := fmt.Sprintf("\n%s %dt\n", nameStyle.Render("Hold Space:"), game.Player.Ship.Holdspace)
+	cash := fmt.Sprintf("\n%s %.1f", nameStyle.Render("Cash:"), float64(game.Player.Cash)/float64(10))
+
+	shipData = headerStyle.Render(shipData) + cash + holdSpace
 
 	return shipData
 

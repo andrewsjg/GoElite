@@ -2,8 +2,10 @@ package tui
 
 import (
 	"log"
+	"strconv"
 
 	eliteEngine "github.com/andrewsjg/GoElite/engine"
+	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,12 +22,15 @@ func (m Tui) Init() tea.Cmd {
 func New(game eliteEngine.Game) *Tui {
 
 	cmdPrompt := textinput.New()
-	cmdPrompt.Focus()
 
 	//TODO: Fix these sizes
-	sysvp := viewport.New(100, 25)
-	mktvp := viewport.New(100, 25)
+	sysvp := viewport.New(100, 24)
+	mktvp := viewport.New(100, 24)
 	shpvp := viewport.New(140, 5)
+
+	//fuelValue := (float64(game.Player.Ship.Fuel) / float64(70)) * float64(100)
+	fuelGuage := progress.New()
+	fuelGuage.Width = 142
 
 	sysvp.SetContent(SprintState(&game))
 	mktvp.SetContent(SprintMarket(&game))
@@ -50,9 +55,14 @@ func New(game eliteEngine.Game) *Tui {
 		},
 	)
 
-	sb.SetContent(game.PlayerCurrentPlanetName(), "", "", "INFO: OK")
+	system := game.GetPlanetaryData(game.PlayerCurrentPlanetName())
+	pos := "(" + strconv.Itoa(int(system.X)) + "," + strconv.Itoa(int(system.Y)) + ")"
+
+	sb.SetContent(game.PlayerCurrentPlanetName(), "", "", "POS: "+pos)
 	//TODO: Fix these sizes
 	sb.SetSize(144)
+
+	cmdPrompt.Focus()
 
 	return &Tui{
 		game:           game,
@@ -60,6 +70,7 @@ func New(game eliteEngine.Game) *Tui {
 		systemViewport: sysvp,
 		marketViewport: mktvp,
 		shipViewport:   shpvp,
+		fuelBar:        fuelGuage,
 		statusBar:      sb,
 	}
 }
