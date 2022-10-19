@@ -42,7 +42,7 @@ type Game struct {
 }
 
 // A gamecommand is a map of commands to the functions that execute the command
-// TODO: Shoult func return a generic type here? For now returning strings works because all
+// TODO: Should func return a generic type here? For now returning strings works because all
 // the result of a command is is some status output that goes on screen
 type GameCommands map[string]func(game *Game, args ...[]string) (stauts string, output string)
 

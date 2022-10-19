@@ -285,26 +285,7 @@ func (g *Galaxy) makeSystem(s *seed) planetarySystem {
 }
 
 /* Return id of the planet whose name matches passed strinmg
-   closest to currentplanet - if none return currentplanet
-
-func (g *Galaxy) Matchsys(platnetName string) int {
-
-	p := g.CurrentPlanet
-	d := 9999
-
-	for syscount := 0; syscount < g.Size; syscount++ {
-
-		if strings.HasPrefix(g.Systems[syscount].Name, platnetName) {
-			if distance(g.Systems[syscount], g.Systems[g.CurrentPlanet]) < d {
-
-				d = distance(g.Systems[syscount], g.Systems[g.CurrentPlanet])
-				p = syscount
-			}
-		}
-	}
-
-	return p
-}  */
+   closest to currentplanet - if none return currentplanet */
 
 // TODO: Dont like the way this works. Revisit
 func (g *Game) Matchsys(platnetName string) int {
