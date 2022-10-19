@@ -25,7 +25,8 @@ Based off of: http://www.iancgbell.clara.net/elite/text/
 - Hyperspace command
 - Help Command
 - ~~TUI Status bar~~
-- Add ship info panel
+- ~~Add ship info panel~~
+- Add ships hold table
 - Tidy up basic TUI
 - Fix bug that means market isnt generated on hyperspace jump
 - Fix fuel bug that allows a player to buy more than max fuel
