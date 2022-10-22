@@ -1,6 +1,6 @@
 # Go Elite
 
-![Go Report Card](https://goreportcard.com/badge/github.com/andrewsjg/GoElite)](<https://goreportcard.com/report/github.com/andrewsjg/GoElite>)
+[![Go Report Card](https://goreportcard.com/badge/github.com/andrewsjg/GoElite)](https://goreportcard.com/report/github.com/andrewsjg/GoElite)
 
 A Go version of TxtElite. Which implements a terminal UI for playing the trading game.
 
