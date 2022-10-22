@@ -91,13 +91,4 @@ func TestFuel(t *testing.T) {
 		t.Error("expected 1 fuel. Got:", game.Player.Ship.Fuel)
 	}
 
-	// Drain cash
-	game.Player.Cash = 0
-
-	// Attempt to buy fuel with no money. This will error
-	err = game.BuyFuel(70)
-	if err == nil {
-		t.Error("Should not have been able to buy fuel", err.Error())
-	}
-
 }
