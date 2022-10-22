@@ -35,7 +35,7 @@ func (m Tui) View() string {
 
 	fuelValue := ((float64(m.game.Player.Ship.Fuel) / float64(70)) * float64(100)) / 100
 	fuelGauge := m.fuelBar.ViewAs(fuelValue)
-	fuelTitle := nameStyle.Render("\nFuel") + fmt.Sprintf(" (%.1fLY):\n", float64(m.game.Player.Ship.Fuel)/10)
+	fuelTitle := nameStyle.Render("\nFuel") + fmt.Sprintf(" (%.1fLY):\n", float64(m.game.Player.Ship.Fuel)/float64(10))
 
 	bottomViews := m.shipViewport.View() + fuelTitle + fuelGauge
 	bottomViews = shipBorder.Render(bottomViews)

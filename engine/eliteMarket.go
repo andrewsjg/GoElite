@@ -225,22 +225,31 @@ func getCommodityIdx(commodity string, commodities []TradeGood) int {
 
 func (g *Game) BuyFuel(amount int16) error {
 
+	// TODO: This can never return an error. Maybe it could, but if not change this function
+	// so that it doesnt return anything
+
+	amountToBuy := amount * 10
+
 	currentCapacity := g.maxFuel - g.Player.Ship.Fuel
+	//fmt.Printf("Current Capacity: %d amount requested: %d\n", currentCapacity, amountToBuy)
 
-	// Check if affordable
-	if g.Player.Cash < int16(g.fuelCost)*amount {
-		return errors.New("not enough money to buy that much fuel")
+	if amountToBuy > int16(currentCapacity) {
+		amountToBuy = int16(currentCapacity)
 	}
 
-	if amount > int16(currentCapacity) {
-		amount = int16(currentCapacity)
+	// Check if affordable. If not only buy the amount we can afford
+	if g.Player.Cash < (int16(g.fuelCost))*int16(amountToBuy) {
+		amountToBuy = int16((g.Player.Cash) / int16(g.fuelCost))
+
 	}
+
+	//fmt.Printf("Current Capacity: %d amount requested: %d\n", currentCapacity, amountToBuy)
 
 	// Add amount of fuel to the ship
-	g.Player.Ship.Fuel = g.Player.Ship.Fuel + (uint16(amount) * 10)
+	g.Player.Ship.Fuel = g.Player.Ship.Fuel + uint16(amountToBuy)
 
-	// Deduct cost from player cash
-	g.Player.Cash = g.Player.Cash - (int16(g.fuelCost) * amount)
+	// Deduct cost from player cash.
+	g.Player.Cash = g.Player.Cash - (int16(g.fuelCost) * (amountToBuy))
 
 	return nil
 }

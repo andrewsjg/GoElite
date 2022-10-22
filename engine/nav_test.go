@@ -31,7 +31,7 @@ func TestJump(t *testing.T) {
 
 }
 
-func TestBuyFuel(t *testing.T) {
+func TestFuel(t *testing.T) {
 	game := InitGame(false)
 
 	// Jump to diso

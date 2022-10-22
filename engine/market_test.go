@@ -31,6 +31,53 @@ func TestGetCommodityIdx(t *testing.T) {
 
 }
 
+func TestBuyFuel(t *testing.T) {
+	game := InitGame(false)
+
+	// reduce current fuel
+	startFuel := game.Player.Ship.Fuel
+
+	if startFuel != game.maxFuel {
+		t.Errorf("Start fuel wrong. Expected %d got: %d\n", game.maxFuel, startFuel)
+	}
+
+	// Take some fuel away
+
+	game.Player.Ship.Fuel = 34
+
+	// Buy more fuel than we need. Should only go to MaxFuel
+
+	err := game.BuyFuel(7)
+
+	if err != nil {
+		t.Error("Error buying fuel: ", err.Error())
+	}
+
+	if game.Player.Ship.Fuel != game.maxFuel {
+		t.Errorf("Fuel amount wrong. Expected %d got: %d\n", game.maxFuel, game.Player.Ship.Fuel)
+	}
+
+	// Buy more fuel than we can afford
+
+	game.Player.Ship.Fuel = 34
+	game.Player.Cash = 10
+
+	err = game.BuyFuel(7)
+
+	if err != nil {
+		t.Error("Error buying fuel: ", err.Error())
+	}
+
+	if game.Player.Ship.Fuel >= game.maxFuel {
+		t.Errorf("Fuel amount wrong when attempting to buy more than we can afford. Expected less than %d got: %d\n", game.maxFuel, game.Player.Ship.Fuel)
+	}
+
+	if game.Player.Cash != 0 {
+		t.Error("Wrong amount of cash after transaction. Should be 5 but got: ", game.Player.Cash)
+	}
+
+}
+
 func TestLaveMarketState(t *testing.T) {
 	game := InitGame(false)
 	market := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet].Market
