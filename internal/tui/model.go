@@ -11,8 +11,9 @@ import (
 type Tui struct {
 	systemViewport viewport.Model
 	marketViewport viewport.Model
-	shipViewport   viewport.Model
+	cmdrViewport   viewport.Model
 	fuelBar        progress.Model
+	holdSpaceBar   progress.Model
 	cmdInput       textinput.Model
 	statusBar      statusbar.Bubble
 	game           eliteEngine.Game

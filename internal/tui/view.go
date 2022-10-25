@@ -19,9 +19,13 @@ func (m Tui) View() string {
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color("63")).Width(60).Height(24)
 
-	shipBorder := lipgloss.NewStyle().
+	cmdrBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63")).Width(142).Height(5)
+		BorderForeground(lipgloss.Color("63")).Width(60).Height(5)
+
+	guageBorder := lipgloss.NewStyle().
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("63")).Width(80).Height(5)
 
 	cmdBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
@@ -35,15 +39,25 @@ func (m Tui) View() string {
 
 	fuelValue := ((float64(m.game.Player.Ship.Fuel) / float64(70)) * float64(100)) / 100
 	fuelGauge := m.fuelBar.ViewAs(fuelValue)
-	fuelTitle := nameStyle.Render("\nFuel") + fmt.Sprintf(" (%.1fLY):\n", float64(m.game.Player.Ship.Fuel)/float64(10))
+	fuelTitle := nameStyle.Render("\nFuel") + fmt.Sprintf(" (%.1fLY):     ", float64(m.game.Player.Ship.Fuel)/float64(10))
 
-	bottomViews := m.shipViewport.View() + fuelTitle + fuelGauge
-	bottomViews = shipBorder.Render(bottomViews)
+	holdSpaceValue := ((float64(m.game.Player.Ship.Holdspace) / float64(20)) * float64(100)) / 100
+	holdSpaceGuage := m.holdSpaceBar.ViewAs(holdSpaceValue)
+	holdTitle := nameStyle.Render("\nHold Space") + fmt.Sprintf(" (%dt): ", m.game.Player.Ship.Holdspace)
+
+	cmdrInfo := m.cmdrViewport.View()
+	cmdrInfo = cmdrBorder.Render(cmdrInfo)
+
+	guageViews := titleStyle.Render("Ship Info\n") + fuelTitle + fuelGauge + " full\n" + holdTitle + holdSpaceGuage + " available"
+	guageViews = guageBorder.Render(guageViews)
+
+	// Ship + Cmdr views
+	dataViews := lipgloss.JoinHorizontal(lipgloss.Top, guageViews, cmdrInfo)
 
 	commandInput := cmdBorder.Render(fmt.Sprintf("Command %s\n\n", m.cmdInput.View()))
 
 	viewPorts := lipgloss.JoinHorizontal(lipgloss.Top, leftViewPort, rightViewPort)
-	composedView := lipgloss.JoinVertical(lipgloss.Top, viewPorts, bottomViews, commandInput, statusBar)
+	composedView := lipgloss.JoinVertical(lipgloss.Top, viewPorts, dataViews, commandInput, statusBar)
 
 	return fmt.Sprintf(
 		titleStyle.Render("--== Elite v1.5 ==--")+"\n\n%s",

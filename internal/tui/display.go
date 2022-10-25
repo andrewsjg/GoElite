@@ -113,15 +113,16 @@ func SprintLocal(game *eliteEngine.Game) string {
 	return localSystems
 }
 
-func SprintShipData(game *eliteEngine.Game) string {
-	shipData := "Ship Info\n"
+func SprintCmdrData(game *eliteEngine.Game) string {
+	shipData := "Commander Info\n"
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 	nameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
 
-	holdSpace := fmt.Sprintf("\n%s %dt\n", nameStyle.Render("Hold Space:"), game.Player.Ship.Holdspace)
-	cash := fmt.Sprintf("\n%s %.1f", nameStyle.Render("Cash:"), float64(game.Player.Cash)/float64(10))
+	//holdSpace := fmt.Sprintf("\n%s %dt\n", nameStyle.Render("Hold Space:"), game.Player.Ship.Holdspace)
+	cmdrInfo := fmt.Sprintf("\n%s TODO\n%s TODO", nameStyle.Render("Commander Name:"), nameStyle.Render("Rank:"))
+	cash := fmt.Sprintf("\n%s %.1f", nameStyle.Render("Commander Cash:"), float64(game.Player.Cash)/float64(10))
 
-	shipData = headerStyle.Render(shipData) + cash + holdSpace
+	shipData = headerStyle.Render(shipData) + cash + cmdrInfo
 
 	return shipData
 

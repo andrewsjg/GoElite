@@ -26,15 +26,17 @@ func New(game eliteEngine.Game) *Tui {
 	//TODO: Fix these sizes
 	sysvp := viewport.New(100, 24)
 	mktvp := viewport.New(100, 24)
-	shpvp := viewport.New(140, 5)
+	cmdrvp := viewport.New(140, 5)
 
-	//fuelValue := (float64(game.Player.Ship.Fuel) / float64(70)) * float64(100)
 	fuelGuage := progress.New()
-	fuelGuage.Width = 142
+	fuelGuage.Width = 50
+
+	holdSpace := progress.New()
+	holdSpace.Width = 50
 
 	sysvp.SetContent(SprintState(&game))
 	mktvp.SetContent(SprintMarket(&game))
-	shpvp.SetContent(SprintShipData(&game))
+	cmdrvp.SetContent(SprintCmdrData(&game))
 
 	sb := statusbar.New(
 		statusbar.ColorConfig{
@@ -69,8 +71,9 @@ func New(game eliteEngine.Game) *Tui {
 		cmdInput:       cmdPrompt,
 		systemViewport: sysvp,
 		marketViewport: mktvp,
-		shipViewport:   shpvp,
+		cmdrViewport:   cmdrvp,
 		fuelBar:        fuelGuage,
+		holdSpaceBar:   holdSpace,
 		statusBar:      sb,
 	}
 }

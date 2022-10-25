@@ -21,7 +21,7 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.cmdInput, tiCmd = m.cmdInput.Update(msg)
 	m.systemViewport, sysVpCmd = m.systemViewport.Update(msg)
 	m.marketViewport, mktVpCmd = m.marketViewport.Update(msg)
-	m.shipViewport, shipVpCmd = m.shipViewport.Update(msg)
+	m.cmdrViewport, shipVpCmd = m.cmdrViewport.Update(msg)
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -69,7 +69,7 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				m.marketViewport.SetContent(SprintMarket(&m.game))
-				m.shipViewport.SetContent(SprintShipData(&m.game))
+				m.cmdrViewport.SetContent(SprintCmdrData(&m.game))
 
 				system := m.game.GetPlanetaryData(m.game.PlayerCurrentPlanetName())
 				pos := "(" + strconv.Itoa(int(system.X)) + "," + strconv.Itoa(int(system.Y)) + ")"
