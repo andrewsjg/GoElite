@@ -9,6 +9,8 @@ import (
 	"golang.org/x/text/language"
 )
 
+var _ tea.Model = &Tui{}
+
 func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var (
@@ -19,6 +21,7 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		holdCmd   tea.Cmd
 	)
 
+	// Propagate updates to subviews
 	m.cmdInput, tiCmd = m.cmdInput.Update(msg)
 	m.systemViewport, sysVpCmd = m.systemViewport.Update(msg)
 	m.marketViewport, mktVpCmd = m.marketViewport.Update(msg)
@@ -29,19 +32,24 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 
-		case tea.KeyCtrlC, tea.KeyEsc:
+		//case tea.KeyCtrlC, tea.KeyEsc:
+		case tea.KeyCtrlC:
 			return m, tea.Quit
 
 		case tea.KeyEnter:
-			//style := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
 			m.gameCmd = m.cmdInput.Value()
 
+			// Handle the exit/quit commands
 			if strings.ToUpper(m.gameCmd) == "EXIT" {
 				return m, tea.Quit
 			}
 
 			if strings.ToUpper(m.gameCmd) == "Q" {
+				return m, tea.Quit
+			}
+
+			if strings.ToUpper(m.gameCmd) == "QUIT" {
 				return m, tea.Quit
 			}
 
@@ -53,6 +61,7 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				status := ""
 				output := ""
 
+				// Handle the display commands rendered by the TUI
 				if strings.ToUpper(m.gameCmd) == "INFO" {
 					output = SprintState(&m.game)
 
@@ -64,6 +73,8 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					output = SprintHelp()
 
 				} else {
+					// Exectute a game command. Game commands alter the game state and are therefore
+					// handled bu the engine.
 					status, output = m.executeTUICommand(m.gameCmd)
 					//status, output = m.game.ExecuteCommand(m.gameCmd)
 				}
@@ -93,8 +104,6 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	return m, tea.Batch(tiCmd, sysVpCmd, mktVpCmd, shipVpCmd, holdCmd)
 }
-
-var _ tea.Model = &Tui{}
 
 // filter commands to use only the commands required by the TUI.
 // TODO: Might be a better way to do this?

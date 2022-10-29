@@ -33,10 +33,6 @@ func (m Tui) View() string {
 		BorderForeground(lipgloss.Color("63")).
 		Width(142)
 
-	/*var tableStyle = lipgloss.NewStyle().
-	BorderStyle(lipgloss.NormalBorder()).
-	BorderForeground(lipgloss.Color("63")) */
-
 	leftViewPort := sysBorder.Render(m.systemViewport.View())
 	rightViewPort := mktBorder.Render(m.marketViewport.View())
 
@@ -53,7 +49,6 @@ func (m Tui) View() string {
 	cmdrInfo := m.cmdrViewport.View()
 	cmdrInfo = cmdrBorder.Render(cmdrInfo)
 
-	//guageViews := titleStyle.Render("Ship Info\n") + fuelTitle + fuelGauge + " full\n" + holdTitle + holdSpaceGuage + " available\n" + tableStyle.Render(m.holdTable.View())
 	guageViews := titleStyle.Render("Ship Info\n") + fuelTitle + fuelGauge + " full\n" + holdTitle + holdSpaceGuage + " available\n\n" + nameStyle.Render("Hold Contents::") + "\n" + m.holdTable.View()
 	guageViews = guageBorder.Render(guageViews)
 
@@ -64,13 +59,13 @@ func (m Tui) View() string {
 
 	viewPorts := lipgloss.JoinHorizontal(lipgloss.Top, leftViewPort, rightViewPort)
 	composedView := lipgloss.JoinVertical(lipgloss.Top, viewPorts, dataViews, commandInput, statusBar)
-	figTitle := figure.NewFigure("--== Elite v1.5 ==--", "starwars", true)
+	figTitle := figure.NewFigure("         --== Elite v1.5 ==--", "small", true)
 	title := figTitle.String()
 
 	return fmt.Sprintf(
 
 		//titleStyle.Render("--== Elite v1.5 ==--")+"\n\n%s",
-		titleStyle.Render(title)+"\n\n%s",
+		titleStyle.Render(title)+"\n%s",
 		composedView,
 	) + "\n\n"
 }

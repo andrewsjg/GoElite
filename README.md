@@ -40,6 +40,7 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - Basic Commander rank info
 - Basic Commander name function
 - Styling for light terminals
+- Check for terminal width
 
 ## Todo - Sometime
 
