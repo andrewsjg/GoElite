@@ -13,11 +13,11 @@ func (m Tui) View() string {
 	//TODO: Look at how to make these more dynamic and cater for light/dark terminals
 	sysBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63")).Width(80).Height(24)
+		BorderForeground(lipgloss.Color("63")).Width(80).Height(26)
 
 	mktBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("63")).Width(60).Height(24)
+		BorderForeground(lipgloss.Color("63")).Width(60).Height(26)
 
 	cmdrBorder := lipgloss.NewStyle().
 		BorderStyle(lipgloss.NormalBorder()).

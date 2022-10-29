@@ -24,8 +24,8 @@ func New(game eliteEngine.Game) *Tui {
 	cmdPrompt := textinput.New()
 
 	//TODO: Fix these sizes
-	sysvp := viewport.New(100, 24)
-	mktvp := viewport.New(100, 24)
+	sysvp := viewport.New(100, 25)
+	mktvp := viewport.New(100, 25)
 	cmdrvp := viewport.New(140, 5)
 
 	fuelGuage := progress.New()
