@@ -1,13 +1,11 @@
 package eliteEngine
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
-	"text/tabwriter"
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
@@ -57,6 +55,9 @@ type NavInfo struct {
 
 // Builds a map of game commands.
 // Each command is a function type that can be called to execute the command
+// These are commands that change the state of the game. Commands that just display things
+// are left upto the UI to render
+
 func buildGameCommands(game *Game) GameCommands {
 
 	gc := GameCommands{}
@@ -219,25 +220,6 @@ func buildGameCommands(game *Game) GameCommands {
 
 	gc["local"] = localCmd
 
-	helpCmd := func(game *Game, args []string) (status string, output string) {
-
-		status = "Help"
-
-		buf := new(bytes.Buffer)
-		w := new(tabwriter.Writer)
-		w.Init(buf, 0, 0, 1, ' ', tabwriter.AlignRight)
-
-		fmt.Fprintln(w, "Commands are:")
-		fmt.Fprintln(w, " Buy\t <commodity>\t  <ammount>")
-		fmt.Fprintln(w, " Buy\t fuel\t  <ammount>") // no trailing tab
-		fmt.Fprintln(w, " Sell\t <commodity>\t  <ammount>")
-		w.Flush()
-
-		output = buf.String()
-		return status, output
-	}
-
-	gc["help"] = helpCmd
 	return gc
 }
 

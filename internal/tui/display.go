@@ -32,6 +32,7 @@ func SprintState(g *eliteEngine.Game) string {
 
 }
 
+// / Returns a formatted string showing the local market
 func SprintMarket(g *eliteEngine.Game) string {
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 	fieldNameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
@@ -61,6 +62,7 @@ func SprintMarket(g *eliteEngine.Game) string {
 	return marketData
 }
 
+// / Returns a formatted string showing system information
 func SprintSystem(game *eliteEngine.Game, systemName string, compressed bool) string {
 
 	systemData := ""
@@ -92,6 +94,7 @@ func SprintSystem(game *eliteEngine.Game, systemName string, compressed bool) st
 	return systemData
 }
 
+// Returns a formatted string showing reachable planets
 func SprintLocal(game *eliteEngine.Game) string {
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 
@@ -113,6 +116,7 @@ func SprintLocal(game *eliteEngine.Game) string {
 	return localSystems
 }
 
+// Returns a formatted string of the commander data
 func SprintCmdrData(game *eliteEngine.Game) string {
 	shipData := "Commander Info\n"
 	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
@@ -128,6 +132,7 @@ func SprintCmdrData(game *eliteEngine.Game) string {
 
 }
 
+// Returns a formatted help string
 func SprintHelp() string {
 	helpText := ""
 
