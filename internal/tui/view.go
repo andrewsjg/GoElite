@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/common-nighthawk/go-figure"
 )
 
 func (m Tui) View() string {
@@ -63,9 +64,13 @@ func (m Tui) View() string {
 
 	viewPorts := lipgloss.JoinHorizontal(lipgloss.Top, leftViewPort, rightViewPort)
 	composedView := lipgloss.JoinVertical(lipgloss.Top, viewPorts, dataViews, commandInput, statusBar)
+	figTitle := figure.NewFigure("--== Elite v1.5 ==--", "starwars", true)
+	title := figTitle.String()
 
 	return fmt.Sprintf(
-		titleStyle.Render("--== Elite v1.5 ==--")+"\n\n%s",
+
+		//titleStyle.Render("--== Elite v1.5 ==--")+"\n\n%s",
+		titleStyle.Render(title)+"\n\n%s",
 		composedView,
 	) + "\n\n"
 }
