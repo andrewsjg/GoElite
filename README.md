@@ -30,7 +30,7 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - ~~TUI Status bar~~
 - ~~Add ship info panel~~
 - Add ships hold table
-- Tidy up basic TUI
+- ~~Tidy up basic TUI~~
 - Fix bug that means market isnt generated on hyperspace jump
 - ~~Fix fuel bug that allows a player to buy more than max fuel~~
 - ~~Fix buy/sell commands where the commodity has a space in its name~~
@@ -39,6 +39,7 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - ~~Fix variadic buy functions. Used incorrectly.~~
 - Basic Commander rank info
 - Basic Commander name function
+- Styling for light terminals
 
 ## Todo - Sometime
 
