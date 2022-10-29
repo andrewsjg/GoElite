@@ -59,6 +59,10 @@ func (m Tui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				} else if strings.ToUpper(m.gameCmd) == "LOCAL" {
 					output = SprintLocal(&m.game)
 
+				} else if strings.ToUpper(m.gameCmd) == "HELP" {
+					status = "Help"
+					output = SprintHelp()
+
 				} else {
 					status, output = m.executeTUICommand(m.gameCmd)
 					//status, output = m.game.ExecuteCommand(m.gameCmd)

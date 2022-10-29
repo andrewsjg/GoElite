@@ -1,8 +1,10 @@
 package tui
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
+	"text/tabwriter"
 
 	eliteEngine "github.com/andrewsjg/GoElite/engine"
 	"github.com/charmbracelet/bubbles/table"
@@ -25,10 +27,6 @@ func SprintState(g *eliteEngine.Game) string {
 
 	gameState = fmt.Sprintf("%s\n\n", headerStyle.Render("System Info"))
 	gameState = gameState + SprintSystem(g, planet, false)
-
-	/*gameState = gameState + fmt.Sprintf("\n%s %.1f\n", style.Render("Cash:"), float64(g.Player.Cash)/float64(10))
-	gameState = gameState + fmt.Sprintf("%s %.1f\n", style.Render("Fuel:"), float64(g.Player.Ship.Fuel)/float64(10))
-	gameState = gameState + fmt.Sprintf("%s %dt", style.Render("Hold Space:"), g.Player.Ship.Holdspace) */
 
 	return gameState
 
@@ -128,6 +126,30 @@ func SprintCmdrData(game *eliteEngine.Game) string {
 
 	return shipData
 
+}
+
+func SprintHelp() string {
+	helpText := ""
+
+	titleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
+	nameStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	argStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("1"))
+
+	buf := new(bytes.Buffer)
+	w := new(tabwriter.Writer)
+	w.Init(buf, 0, 0, 1, ' ', tabwriter.AlignRight)
+
+	fmt.Fprintln(w, titleStyle.Render("Text Elite Help\n"))
+	fmt.Fprintln(w, "Commands are:")
+	fmt.Fprintln(w, nameStyle.Render(" Buy")+"\t "+argStyle.Render("<commodity>")+"\t "+argStyle.Render("<ammount>")+"\t - Buy <ammount> of a commodity")
+	fmt.Fprintln(w, nameStyle.Render(" Buy")+"\t "+argStyle.Render("fuel")+"\t "+argStyle.Render("<ammount>"))
+	fmt.Fprintln(w, nameStyle.Render(" Sell")+"\t "+argStyle.Render("<commodity>")+"\t "+argStyle.Render("<ammount>"))
+
+	w.Flush()
+
+	helpText = buf.String()
+
+	return helpText
 }
 
 func HoldTable(game *eliteEngine.Game) table.Model {

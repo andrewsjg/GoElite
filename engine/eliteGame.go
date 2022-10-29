@@ -227,7 +227,7 @@ func buildGameCommands(game *Game) GameCommands {
 		w := new(tabwriter.Writer)
 		w.Init(buf, 0, 0, 1, ' ', tabwriter.AlignRight)
 
-		fmt.Fprintln(w, "Commands are:\n")
+		fmt.Fprintln(w, "Commands are:")
 		fmt.Fprintln(w, " Buy\t <commodity>\t  <ammount>")
 		fmt.Fprintln(w, " Buy\t fuel\t  <ammount>") // no trailing tab
 		fmt.Fprintln(w, " Sell\t <commodity>\t  <ammount>")
