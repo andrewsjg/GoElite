@@ -44,7 +44,7 @@ type Game struct {
 // A gamecommand is a map of commands to the functions that execute the command
 // TODO: Should func return a generic type here? For now returning strings works because all
 // the result of a command is is some status output that goes on screen
-type GameCommands map[string]func(game *Game, args ...[]string) (stauts string, output string)
+type GameCommands map[string]func(game *Game, args []string) (stauts string, output string)
 
 type NavInfo struct {
 	System                   planetarySystem
@@ -61,23 +61,21 @@ func buildGameCommands(game *Game) GameCommands {
 
 	// Info Command
 
-	infoCmd := func(game *Game, args ...[]string) (status string, output string) {
+	infoCmd := func(game *Game, args []string) (status string, output string) {
 		return "", game.SprintState()
 	}
 	gc["info"] = infoCmd
 
 	// Jump Command
 
-	jumpCmd := func(game *Game, args ...[]string) (status string, output string) {
-		// Because this is variadic and how I am passing the arguments as a split string,
-		// the args are an array of string arrays. This makes this code a bit wierd. Might be a way around this?
+	jumpCmd := func(game *Game, args []string) (status string, output string) {
 
 		jumpResult := "Unknown Destination"
 
 		//fmt.Println(args)
-		if len(args[0]) >= 2 {
+		if len(args) >= 1 {
 
-			dest := args[0][1]
+			dest := args[0]
 			err := game.Jump(dest)
 
 			if err != nil {
@@ -93,7 +91,7 @@ func buildGameCommands(game *Game) GameCommands {
 	}
 	gc["jump"] = jumpCmd
 
-	mktCmd := func(game *Game, args ...[]string) (status string, output string) {
+	mktCmd := func(game *Game, args []string) (status string, output string) {
 
 		system := game.Galaxy.Systems[game.Player.Ship.Location.CurrentPlanet]
 		output = system.SprintMarket(game.Commodities)
@@ -104,12 +102,20 @@ func buildGameCommands(game *Game) GameCommands {
 
 	gc["mkt"] = mktCmd
 
-	buyCmd := func(game *Game, args ...[]string) (status string, output string) {
+	buyCmd := func(game *Game, args []string) (status string, output string) {
 
-		if len(args[0]) >= 3 {
+		if len(args) >= 2 {
 
-			commodity := args[0][1]
-			amount, err := strconv.Atoi(args[0][2])
+			commodity := args[0]
+			strAmount := args[1]
+
+			// Deal with commodities that have spaces. For example "Robot Slaves"
+			if len(args) > 2 {
+				commodity = commodity + " " + args[1]
+				strAmount = args[2]
+			}
+
+			amount, err := strconv.Atoi(strAmount)
 
 			if err != nil {
 				amount = 0
@@ -142,12 +148,19 @@ func buildGameCommands(game *Game) GameCommands {
 
 	gc["buy"] = buyCmd
 
-	sellCmd := func(game *Game, args ...[]string) (status string, output string) {
+	sellCmd := func(game *Game, args []string) (status string, output string) {
 
-		if len(args[0]) >= 3 {
-			commodity := args[0][1]
+		if len(args) >= 2 {
+			commodity := args[0]
+			strAmount := args[1]
 
-			amount, err := strconv.Atoi(args[0][2])
+			// Deal with commodities that have spaces. For example "Robot Slaves"
+			if len(args) > 2 {
+				commodity = commodity + " " + args[1]
+				strAmount = args[2]
+			}
+
+			amount, err := strconv.Atoi(strAmount)
 
 			if err != nil {
 				amount = 0
@@ -169,21 +182,21 @@ func buildGameCommands(game *Game) GameCommands {
 
 	gc["sell"] = sellCmd
 
-	hyperCmd := func(game *Game, args ...[]string) (status string, output string) {
+	hyperCmd := func(game *Game, args []string) (status string, output string) {
 
 		return status, output
 	}
 
 	gc["hyper"] = hyperCmd
 
-	localCmd := func(game *Game, args ...[]string) (status string, output string) {
+	localCmd := func(game *Game, args []string) (status string, output string) {
 
 		return status, output
 	}
 
 	gc["local"] = localCmd
 
-	helpCmd := func(game *Game, args ...[]string) (status string, output string) {
+	helpCmd := func(game *Game, args []string) (status string, output string) {
 
 		return status, output
 	}
@@ -200,12 +213,15 @@ func (g *Game) ExecuteCommand(cmd string) (status string, output string) {
 	status = "Command not found"
 	cmdParts := strings.Fields(cmd)
 
-	if g.GameCommands[cmdParts[0]] != nil {
+	gameCommand := cmdParts[0]
+	cmdArgs := cmdParts[1:]
+
+	if g.GameCommands[gameCommand] != nil {
 
 		// Pull the command function out of the commands map
-		cmdFunc := g.GameCommands[cmdParts[0]]
+		cmdFunc := g.GameCommands[gameCommand]
 		// Call the command function
-		status, cmdOutput = cmdFunc(g, cmdParts)
+		status, cmdOutput = cmdFunc(g, cmdArgs)
 	}
 
 	return status, cmdOutput
