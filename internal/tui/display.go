@@ -2,8 +2,10 @@ package tui
 
 import (
 	"fmt"
+	"strconv"
 
 	eliteEngine "github.com/andrewsjg/GoElite/engine"
+	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -126,4 +128,34 @@ func SprintCmdrData(game *eliteEngine.Game) string {
 
 	return shipData
 
+}
+
+func HoldTable(game *eliteEngine.Game) table.Model {
+
+	columns := []table.Column{}
+	//rows := []table.Row{}
+	quants := []string{}
+
+	for _, commodity := range game.Commodities {
+
+		col := table.Column{Title: commodity.Abbrievation, Width: len(commodity.Abbrievation)}
+		columns = append(columns, col)
+	}
+
+	for _, quantity := range game.Player.Ship.Hold {
+
+		quant := strconv.Itoa(int(quantity))
+		quants = append(quants, quant)
+	}
+
+	rows := []table.Row{quants}
+
+	t := table.New(
+		table.WithColumns(columns),
+		table.WithRows(rows),
+		//table.WithFocused(true),
+		table.WithHeight(2),
+	)
+
+	return t
 }

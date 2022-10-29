@@ -34,6 +34,8 @@ func New(game eliteEngine.Game) *Tui {
 	holdSpace := progress.New()
 	holdSpace.Width = 50
 
+	holdTable := HoldTable(&game)
+
 	sysvp.SetContent(SprintState(&game))
 	mktvp.SetContent(SprintMarket(&game))
 	cmdrvp.SetContent(SprintCmdrData(&game))
@@ -74,6 +76,7 @@ func New(game eliteEngine.Game) *Tui {
 		cmdrViewport:   cmdrvp,
 		fuelBar:        fuelGuage,
 		holdSpaceBar:   holdSpace,
+		holdTable:      holdTable,
 		statusBar:      sb,
 	}
 }
