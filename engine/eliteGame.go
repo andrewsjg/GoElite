@@ -1,11 +1,13 @@
 package eliteEngine
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
+	"text/tabwriter"
 )
 
 // Go implementation of txtelite. See: http://www.iancgbell.clara.net/elite/text/
@@ -191,6 +193,27 @@ func buildGameCommands(game *Game) GameCommands {
 
 	localCmd := func(game *Game, args []string) (status string, output string) {
 
+		status = "Local System Info Requested"
+
+		if len(args) >= 1 {
+			systemName := args[0]
+			sd := game.GetPlanetaryData(systemName)
+
+			output = output + fmt.Sprintf("%s %s\n", "System:", sd.Name)
+			output = output + fmt.Sprintf("%s (%d,", "Position:", sd.X)
+			output = output + fmt.Sprintf("%d)\n", sd.Y)
+			output = output + fmt.Sprintf("%s (%d) ", "Economy:", sd.Economy)
+			output = output + fmt.Sprintf("%s\n", sd.EconomyName)
+			output = output + fmt.Sprintf("%s (%d) ", "Government", sd.Govtype)
+			output = output + fmt.Sprintf("%s\n", sd.GovName)
+			output = output + fmt.Sprintf("%s %2d\n", "Tech Level:", sd.Techlev)
+			output = output + fmt.Sprintf("%s %d\n", "Turnover:", (sd.Productivity))
+			output = output + fmt.Sprintf("%s %d\n", "Radius:", sd.Radius)
+			output = output + fmt.Sprintf("%s %d Billion\n", "Population:", (sd.Population)>>3)
+
+			output = output + sd.Description + "\n"
+		}
+
 		return status, output
 	}
 
@@ -198,6 +221,19 @@ func buildGameCommands(game *Game) GameCommands {
 
 	helpCmd := func(game *Game, args []string) (status string, output string) {
 
+		status = "Help"
+
+		buf := new(bytes.Buffer)
+		w := new(tabwriter.Writer)
+		w.Init(buf, 0, 0, 1, ' ', tabwriter.AlignRight)
+
+		fmt.Fprintln(w, "Commands are:\n")
+		fmt.Fprintln(w, " Buy\t <commodity>\t  <ammount>")
+		fmt.Fprintln(w, " Buy\t fuel\t  <ammount>") // no trailing tab
+		fmt.Fprintln(w, " Sell\t <commodity>\t  <ammount>")
+		w.Flush()
+
+		output = buf.String()
 		return status, output
 	}
 

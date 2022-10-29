@@ -97,7 +97,7 @@ var _ tea.Model = &Tui{}
 func (m *Tui) executeTUICommand(cmd string) (status string, output string) {
 
 	// Need to filter the commands that are valid in the tui
-	tuiCmds := "jump,buy,sell,local,info"
+	tuiCmds := "jump,buy,sell,local,info,help"
 	cmdParts := strings.Fields(cmd)
 
 	if len(cmdParts) >= 1 {
