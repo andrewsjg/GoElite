@@ -33,10 +33,10 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - Tidy up basic TUI
 - Fix bug that means market isnt generated on hyperspace jump
 - ~~Fix fuel bug that allows a player to buy more than max fuel~~
-- Fix buy/sell commands where the commodity has a space in its name
+- ~~Fix buy/sell commands where the commodity has a space in its name~~
 - ~~Check Fuel maths. Strange things happen when buying fuel~~
-- Tidy up the game title. Styling with Lipgloss?
-- Fix variadic buy functions. Used incorrectly.
+- Tidy up the game title. Styling with Lipgloss? - Sort of done. Not sure I like it yet
+- ~~Fix variadic buy functions. Used incorrectly.~~
 - Basic Commander rank info
 - Basic Commander name function
 
