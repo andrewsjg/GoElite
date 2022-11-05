@@ -187,6 +187,9 @@ func buildGameCommands(game *Game) GameCommands {
 
 	hyperCmd := func(game *Game, args []string) (status string, output string) {
 
+		game.HyperSpaceJump()
+		status = "Hyperspace Jump complete"
+
 		return status, output
 	}
 
@@ -332,6 +335,12 @@ func (g *Game) HyperSpaceJump() {
 	}
 
 	g.Galaxy.buildGalaxy(g.Galaxy.galaxyNum)
+
+	currentPlanet := g.Player.Ship.Location.CurrentPlanet
+
+	// Generate the local market. This is a bit ugly
+	g.Galaxy.Systems[currentPlanet].generateMarket(g.Commodities, uint16(g.randByte()))
+
 }
 
 // Return and array of reachable systems

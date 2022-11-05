@@ -25,13 +25,13 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - ~~Jump Command~~
 - ~~Info Command~~
 - ~~Local Command~~
-- Hyperspace command
+- ~~Hyperspace command~~
 - Help Command
 - ~~TUI Status bar~~
 - ~~Add ship info panel~~
 - ~~Add ships hold table~~
 - ~~Tidy up basic TUI~~
-- Fix bug that means market isnt generated on hyperspace jump
+- ~~Fix bug that means market isnt generated on hyperspace jump~~
 - ~~Fix fuel bug that allows a player to buy more than max fuel~~
 - ~~Fix buy/sell commands where the commodity has a space in its name~~
 - ~~Check Fuel maths. Strange things happen when buying fuel~~
@@ -41,6 +41,7 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - Basic Commander name function
 - Styling for light terminals
 - Check for terminal width
+- Fix Local output display
 
 ## Todo - Sometime
 

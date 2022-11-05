@@ -146,9 +146,15 @@ func SprintHelp() string {
 
 	fmt.Fprintln(w, titleStyle.Render("Text Elite Help\n"))
 	fmt.Fprintln(w, "Commands are:")
-	fmt.Fprintln(w, nameStyle.Render(" Buy")+"\t "+argStyle.Render("<commodity>")+"\t "+argStyle.Render("<ammount>")+"\t - Buy <ammount> of a commodity")
-	fmt.Fprintln(w, nameStyle.Render(" Buy")+"\t "+argStyle.Render("fuel")+"\t "+argStyle.Render("<ammount>"))
-	fmt.Fprintln(w, nameStyle.Render(" Sell")+"\t "+argStyle.Render("<commodity>")+"\t "+argStyle.Render("<ammount>"))
+	fmt.Fprintln(w, nameStyle.Render(" buy")+"\t "+argStyle.Render("<commodity>")+"\t "+argStyle.Render("<ammount>")+"\t - Buy <ammount> of a commodity")
+	fmt.Fprintln(w, nameStyle.Render(" buy")+"\t "+argStyle.Render("fuel")+"\t "+argStyle.Render("<ammount>")+"\t - Buy <ammount> of a fuel")
+	fmt.Fprintln(w, nameStyle.Render(" sell")+"\t "+argStyle.Render("<commodity>")+"\t "+argStyle.Render("<ammount>")+"\t - Sell <ammount> of a commondity")
+	fmt.Fprintln(w, nameStyle.Render(" jump")+"\t "+argStyle.Render("<destination>")+"\t "+argStyle.Render("")+"\t - Jump to <destination> system")
+	fmt.Fprintln(w, nameStyle.Render(" hyper")+"\t "+argStyle.Render("")+"\t "+argStyle.Render("")+"\t - Jump to next Galaxy")
+	fmt.Fprintln(w, nameStyle.Render(" info")+"\t "+argStyle.Render("")+"\t "+argStyle.Render("")+"\t - Display the current system info")
+	fmt.Fprintln(w, nameStyle.Render(" local")+"\t "+argStyle.Render("")+"\t "+argStyle.Render("")+"\t - Display local systems. Within fuel range")
+	fmt.Fprintln(w, nameStyle.Render(" quit/q")+"\t "+argStyle.Render("")+"\t "+argStyle.Render("")+"\t - Quit the game")
+	fmt.Fprintln(w, nameStyle.Render(" help")+"\t "+argStyle.Render("")+"\t "+argStyle.Render("")+"\t - Display this help screen")
 
 	w.Flush()
 
