@@ -64,7 +64,7 @@ brews:
     #
     # Default depends on the client.
   
-    url_template: "https://github.com/andrewsjg/GoElite/releases/downloads/{{ .Tag }}/{{ .ArtifactName }}"
+    url_template: "https://github.com/andrewsjg/GoElite/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
 
     # Allows you to set a custom download strategy. Note that you'll need
     # to implement the strategy and add it to your tap repository.
