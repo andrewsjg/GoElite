@@ -18,7 +18,7 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 ## Todo - Now
 
 - ~~Market Command~~
-- Local Command
+- ~~Local Command~~
 - ~~Buy Command~~
 - ~~Sell Command~~
 - ~~Fuel Command~~
@@ -42,6 +42,8 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - Styling for light terminals
 - Check for terminal width
 - Fix Local output display
+- Add webpage for homebrew
+- Add version option. Do I need Cobra?
 
 ## Todo - Sometime
 
