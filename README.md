@@ -1,9 +1,9 @@
-# Go Elite
+# Go txtelite
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/andrewsjg/GoElite)](https://goreportcard.com/report/github.com/andrewsjg/GoElite)
 ![tests](https://github.com/andrewsjg/GoElite/workflows/tests/badge.svg)
 
-TxtElite Implemented in Go. Including a terminal UI for playing the trading game.
+txtelite Implemented in Go. Including a terminal UI for playing the trading game.
 
 Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 
