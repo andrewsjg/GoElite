@@ -53,7 +53,7 @@ brews:
       # Optionally a branch can be provided. (templateable)
       #
       # Defaults to the default repository branch.
-      branch: txtelite
+      branch: main
 
       # Optionally a token can be provided, if it differs from the token
       # provided to GoReleaser
