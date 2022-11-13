@@ -30,7 +30,7 @@ Go to the [releases](https://github.com/andrewsjg/GoElite/releases) page in this
 ### Via Homebrew on macOS
 
 - Add my TAP to homebrew: `brew tap andrewsjg/tap`
-- Install `txtelite`: `brew install txtelite`
+- Install txtelite: `brew install txtelite`
 
 ## Todo
 
