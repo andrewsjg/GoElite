@@ -58,7 +58,7 @@ Go to the [releases](https://github.com/andrewsjg/GoElite/releases) page in this
 - Basic Commander name function
 - Styling for light terminals
 - Check for terminal width
-- Fix Local output display
+- ~~Fix Local cmd output display~~
 - Add webpage for homebrew
 - ~~Add version option. Do I need Cobra?~~
 - Fix TUI when running on windows
