@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	engine "github.com/andrewsjg/GoElite/engine"
 	"github.com/andrewsjg/GoElite/internal/tui"
@@ -11,6 +13,20 @@ func main() {
 
 	//game := engine.InitGame(false)
 	//debugTests(game)
+
+	// TODO: Probably a better way to encode version required
+	const VER = "0.1.0"
+
+	args := os.Args[1:]
+
+	if len(args) >= 1 {
+		arg0 := strings.ToUpper(args[0])
+
+		if arg0 == "--VERSION" || arg0 == "--VER" {
+			fmt.Println(VER)
+			return
+		}
+	}
 
 	tui.Start()
 

@@ -43,7 +43,7 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 - Check for terminal width
 - Fix Local output display
 - Add webpage for homebrew
-- Add version option. Do I need Cobra?
+- ~~Add version option. Do I need Cobra?~~
 
 ## Todo - Sometime
 
