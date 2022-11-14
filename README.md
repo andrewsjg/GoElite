@@ -61,13 +61,14 @@ Type 'help' after running it to see the available commands.
 - Styling for light terminals
 - Check for terminal width
 - ~~Fix Local cmd output display~~
-- Add webpage for homebrew
+- ~~Add webpage for homebrew~~
 - ~~Add version option. Do I need Cobra?~~
 - Fix TUI when running on windows
 
 ## Todo - Sometime
 
 - Improved TUI
+- Render the galaxy
 - Game saves
 - Score
 - "Improved" economy
