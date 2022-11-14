@@ -10,7 +10,8 @@ import (
 
 func main() {
 
-	// TODO: Probably a better way to encode version required
+	// TODO: Need a better way to encode and report the version.
+	// TODO: Need better functionality to test the binary works properly
 	const VER = "0.1.4"
 
 	args := os.Args[1:]
