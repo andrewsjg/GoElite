@@ -32,6 +32,8 @@ Go to the [releases](https://github.com/andrewsjg/GoElite/releases) page in this
 - Add my TAP to homebrew: `brew tap andrewsjg/tap`
 - Install txtelite: `brew install txtelite`
 
+Type 'help' after running it to see the available commands.
+
 ## Todo
 
 - ~~Market Command~~
