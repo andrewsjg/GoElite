@@ -11,6 +11,7 @@ Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 
 **NOTE:** txtelite looks best when run in a terminal with a dark background. In future I will add colour schemes to suit light terminals as well.
 
+![Text Elite](img/txtelite.png)
 ### From Source
 
 This version of txtelite has been tested on macOS versions 13 (Ventura) and 12 (Monterey) and on Ubuntu Linux 22.04.
