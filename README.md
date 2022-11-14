@@ -7,11 +7,11 @@ txtelite Implemented in Go. Including a terminal UI for playing the trading game
 
 Based off of [Ian Bell's Text Elite](http://www.iancgbell.clara.net/elite/text/)
 
+![Text Elite](img/txtelite.png)
+
 ## Installing
 
 **NOTE:** txtelite looks best when run in a terminal with a dark background. In future I will add colour schemes to suit light terminals as well.
-
-![Text Elite](img/txtelite.png)
 
 ### From Source
 
